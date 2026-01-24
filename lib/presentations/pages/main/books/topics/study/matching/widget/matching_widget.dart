@@ -25,10 +25,11 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
   int elapsedSeconds = 0;
   bool isCompleted = false;
 
+  bool _isInitialized = false;
+
   @override
   void initState() {
     super.initState();
-    _initializeCards();
     startTime = DateTime.now();
     _startTimer();
     _successController = AnimationController(
@@ -41,22 +42,43 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
     );
   }
 
-  void _startTimer() {
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted && !isCompleted) {
-        setState(() {
-          elapsedSeconds = DateTime.now().difference(startTime!).inSeconds;
-        });
-        _startTimer();
-      }
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      _initializeCards();
+      _isInitialized = true;
+    }
   }
 
   void _initializeCards() {
     allCards.clear();
 
+    // Ekran balandligiga qarab maksimal qatorlarni hisoblash
+    final context = this.context;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final safeAreaTop = MediaQuery.of(context).padding.top;
+    final safeAreaBottom = MediaQuery.of(context).padding.bottom;
+
+    final appBarHeight = 56.0;
+    final headerHeight = 80.0;
+    final bottomPadding = 24.0;
+    final topPadding = 12.0;
+    final spacing = 10.0;
+
+    final availableHeight = screenHeight - safeAreaTop - safeAreaBottom -
+        appBarHeight - headerHeight - bottomPadding - topPadding;
+
+    final minCardHeight = 85.0;
+    int maxPossibleRows = ((availableHeight - (spacing * 5)) / (minCardHeight + spacing)).floor();
+    maxPossibleRows = maxPossibleRows.clamp(5, 6);
+
+    // Barcha so'zlarni aralashtirib, keyin faqat maxPossibleRows miqdorida olish
+    final shuffledWords = List<Word>.from(widget.words)..shuffle();
+    final wordsToUse = shuffledWords.take(maxPossibleRows).toList();
+
     // Add Korean words
-    for (var word in widget.words) {
+    for (var word in wordsToUse) {
       allCards.add(MatchCard(
         id: word.id ?? 0,
         text: word.koreanWord ?? '',
@@ -65,7 +87,7 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
     }
 
     // Add Uzbek translations
-    for (var word in widget.words) {
+    for (var word in wordsToUse) {
       allCards.add(MatchCard(
         id: word.id ?? 0,
         text: word.uzbekWord ?? '',
@@ -75,6 +97,17 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
 
     // Shuffle all cards
     allCards.shuffle();
+  }
+
+  void _startTimer() {
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted && !isCompleted) {
+        setState(() {
+          elapsedSeconds = DateTime.now().difference(startTime!).inSeconds;
+        });
+        _startTimer();
+      }
+    });
   }
 
   void _onCardTap(int index) {
@@ -132,11 +165,13 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
   }
 
   String _getPerformanceText(int seconds) {
-    if (seconds <= 15) {
+    final wordsCount = allCards.length ~/ 2;
+    final avgTimePerWord = seconds / wordsCount;
+    if (avgTimePerWord <= 3) {
       return 'Ajoyib! Juda tez!';
-    } else if (seconds <= 30) {
+    } else if (avgTimePerWord <= 5) {
       return 'A\'lo! Yaxshi natija!';
-    } else if (seconds <= 45) {
+    } else if (avgTimePerWord <= 7) {
       return 'Yaxshi! Davom eting!';
     } else {
       return 'Tugatdingiz!';
@@ -144,11 +179,13 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
   }
 
   IconData _getPerformanceIcon(int seconds) {
-    if (seconds <= 15) {
+    final wordsCount = allCards.length ~/ 2;
+    final avgTimePerWord = seconds / wordsCount;
+    if (avgTimePerWord <= 3) {
       return Icons.emoji_events_rounded;
-    } else if (seconds <= 30) {
+    } else if (avgTimePerWord <= 5) {
       return Icons.celebration_rounded;
-    } else if (seconds <= 45) {
+    } else if (avgTimePerWord <= 7) {
       return Icons.sentiment_very_satisfied_rounded;
     } else {
       return Icons.sentiment_satisfied_rounded;
@@ -194,9 +231,9 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Barcha so\'zlarni to\'g\'ri moslashtirdingiz',
-                style: TextStyle(
+              Text(
+                '${allCards.length ~/ 2} ta so\'zni to\'g\'ri moslashtirdingiz',
+                style: const TextStyle(
                   fontSize: 16,
                   color: Color(0xFF6B7280),
                 ),
@@ -300,9 +337,17 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                           isCompleted = false;
                           startTime = DateTime.now();
                           elapsedSeconds = 0;
-                          _initializeCards();
+                          _isInitialized = false;
                         });
                         _startTimer();
+                        // didChangeDependencies will call _initializeCards
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            setState(() {
+                              _initializeCards();
+                            });
+                          }
+                        });
                       },
                       child: const Text(
                         'Qayta',
@@ -373,24 +418,34 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
     final safeAreaTop = MediaQuery.of(context).padding.top;
     final safeAreaBottom = MediaQuery.of(context).padding.bottom;
 
-    // Calculate optimal card dimensions
     final appBarHeight = 56.0;
     final headerHeight = 80.0;
-    final bottomPadding = 16.0;
-
-    final availableHeight = screenHeight - safeAreaTop - safeAreaBottom - appBarHeight - headerHeight - bottomPadding;
-
-    // Calculate number of rows that can fit
-    final minCardHeight = 100.0;
+    final bottomPadding = 24.0;
+    final topPadding = 12.0;
     final spacing = 10.0;
-    final verticalPadding = 24.0;
+    final horizontalPadding = 32.0;
 
-    int maxRows = ((availableHeight - verticalPadding) / (minCardHeight + spacing)).floor();
-    maxRows = maxRows.clamp(3, 6); // Between 3 and 6 rows
+    final availableHeight = screenHeight - safeAreaTop - safeAreaBottom -
+        appBarHeight - headerHeight - bottomPadding - topPadding;
 
-    final cardHeight = (availableHeight - verticalPadding - (spacing * (maxRows - 1))) / maxRows;
-    final cardWidth = (screenWidth - 42) / 2;
+    // Haqiqiy qator soni (kartochkalar soniga qarab)
+    final totalCards = allCards.length;
+    final actualRows = (totalCards / 2).ceil(); // 2 ta ustun bo'lgani uchun
+
+    // Maksimal qator soni ekran balandligiga qarab (5 yoki 6)
+    final minCardHeight = 85.0;
+    int maxPossibleRows = ((availableHeight - (spacing * 5)) / (minCardHeight + spacing)).floor();
+    maxPossibleRows = maxPossibleRows.clamp(5, 6);
+
+    // Haqiqiy qatorlar va maksimal qatorlar orasidan kichigini olish
+    final rows = actualRows < maxPossibleRows ? actualRows : maxPossibleRows;
+
+    final cardHeight = (availableHeight - (spacing * (rows - 1))) / rows;
+    final cardWidth = (screenWidth - horizontalPadding - spacing) / 2;
     final aspectRatio = cardWidth / cardHeight;
+
+    // Scroll kerakmi tekshirish
+    final needsScroll = actualRows > maxPossibleRows;
 
     return Column(
       children: [
@@ -404,9 +459,9 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${matchedIndices.length ~/ 2}/${widget.words.length} moslandi',
+                '${matchedIndices.length ~/ 2}/${allCards.length ~/ 2} moslandi',
                 style: TextStyle(
-                  fontSize: screenWidth * 0.04, // 4% of width
+                  fontSize: screenWidth * 0.04,
                   fontWeight: FontWeight.w600,
                   color: const Color(0xFF6B7280),
                 ),
@@ -430,13 +485,13 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                         Icon(
                           Icons.timer_outlined,
                           color: Colors.white,
-                          size: screenWidth * 0.04, // 4% of width
+                          size: screenWidth * 0.04,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           _formatTime(elapsedSeconds),
                           style: TextStyle(
-                            fontSize: screenWidth * 0.035, // 3.5% of width
+                            fontSize: screenWidth * 0.035,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -462,13 +517,13 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                         Icon(
                           Icons.star,
                           color: Colors.white,
-                          size: screenWidth * 0.04, // 4% of width
+                          size: screenWidth * 0.04,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '$score',
                           style: TextStyle(
-                            fontSize: screenWidth * 0.035, // 3.5% of width
+                            fontSize: screenWidth * 0.035,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
@@ -486,20 +541,18 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
         Expanded(
           child: GridView.builder(
             padding: EdgeInsets.fromLTRB(
-            16,
-            12,
-            16,
-            MediaQuery.of(context).padding.bottom + 24,
-          ),
-
-            physics: const BouncingScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              childAspectRatio: 1.64, // test qilib 1.4 – 1.8 oralig‘ida sozlaysiz
+              16,
+              topPadding,
+              16,
+              bottomPadding,
             ),
-
+            physics: needsScroll ? const BouncingScrollPhysics() : const NeverScrollableScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: spacing,
+              crossAxisSpacing: spacing,
+              childAspectRatio: aspectRatio,
+            ),
             itemCount: allCards.length,
             itemBuilder: (context, index) {
               final card = allCards[index];
