@@ -31,12 +31,12 @@ Future<void> setupDependencies() async {
           () => GoogleSheetsService(getIt<Database>())
   );
 
-  //
-  // // TTS Service - Singleton sifatida
-  // getIt.registerLazySingleton<TtsService>(() => TtsService());
-  //
-  // // TTS-ni initialize qilish (ixtiyoriy, birinchi ishlatishda ham avtomatik qiladi)
-  // await getIt<TtsService>().initialize();
+
+  // TTS Service - Singleton sifatida
+  getIt.registerLazySingleton<TtsService>(() => TtsService());
+
+  // TTS-ni initialize qilish (ixtiyoriy, birinchi ishlatishda ham avtomatik qiladi)
+  await getIt<TtsService>().initialize();
 
 }
 

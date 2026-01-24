@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:k_quiz/utils/extensions.dart';
 
 import '../../../../../../../../data/models/word.dart';
+import '../../../../../../../../di/service_locator.dart';
 import '../../../../../../../ui/common/gradient_card.dart';
+import '../../../../../../../../services/tts_service.dart';
 
 
 // ============ FLASHCARDS WIDGET ============
@@ -250,6 +252,42 @@ class FlashcardItem extends StatefulWidget {
 
 class _FlashcardItemState extends State<FlashcardItem> {
   bool isFlipped = false;
+  late TtsService _ttsService;
+  bool isSpeaking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _ttsService = getIt<TtsService>();
+    _setupTtsHandlers();
+  }
+
+  void _setupTtsHandlers() {
+    _ttsService.setCompletionHandler(() {
+      if (mounted) {
+        setState(() {
+          isSpeaking = false;
+        });
+      }
+    });
+
+    _ttsService.setErrorHandler((msg) {
+      if (mounted) {
+        setState(() {
+          isSpeaking = false;
+        });
+      }
+      print("TTS xatosi: $msg");
+    });
+
+    _ttsService.setStartHandler(() {
+      if (mounted) {
+        setState(() {
+          isSpeaking = true;
+        });
+      }
+    });
+  }
 
   @override
   void didUpdateWidget(FlashcardItem oldWidget) {
@@ -258,7 +296,9 @@ class _FlashcardItemState extends State<FlashcardItem> {
     if (widget.isCurrentCard != oldWidget.isCurrentCard && !widget.isCurrentCard) {
       setState(() {
         isFlipped = false;
+        isSpeaking = false;
       });
+      _ttsService.stop();
     }
   }
 
@@ -266,6 +306,26 @@ class _FlashcardItemState extends State<FlashcardItem> {
     setState(() {
       isFlipped = !isFlipped;
     });
+  }
+
+  Future<void> _speak() async {
+    if (isSpeaking) {
+      await _ttsService.stop();
+      setState(() {
+        isSpeaking = false;
+      });
+    } else {
+      final koreanWord = widget.word.koreanWord ?? '';
+      if (koreanWord.isNotEmpty) {
+        await _ttsService.speakKorean(koreanWord);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _ttsService.stop();
+    super.dispose();
   }
 
   @override
@@ -276,6 +336,8 @@ class _FlashcardItemState extends State<FlashcardItem> {
         isFlipped: isFlipped,
         frontText: widget.word.koreanWord ?? '',
         backText: widget.word.uzbekWord ?? '',
+        onSpeak: _speak,
+        isSpeaking: isSpeaking,
       ),
     );
   }
@@ -286,12 +348,16 @@ class FlipCard extends StatefulWidget {
   final bool isFlipped;
   final String frontText;
   final String backText;
+  final VoidCallback onSpeak;
+  final bool isSpeaking;
 
   const FlipCard({
     super.key,
     required this.isFlipped,
     required this.frontText,
     required this.backText,
+    required this.onSpeak,
+    required this.isSpeaking,
   });
 
   @override
@@ -350,6 +416,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
             widget.frontText,
             [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
             Icons.translate_rounded,
+            showVoiceButton: true,
           )
               : Transform(
             transform: Matrix4.identity()..rotateY(pi),
@@ -358,6 +425,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
               widget.backText,
               [const Color(0xFF10B981), const Color(0xFF059669)],
               Icons.check_circle_outline_rounded,
+              showVoiceButton: false,
             ),
           ),
         );
@@ -365,10 +433,15 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildCardSide(String text, List<Color> gradientColors, IconData icon) {
+  Widget _buildCardSide(
+      String text,
+      List<Color> gradientColors,
+      IconData icon,
+      {required bool showVoiceButton}
+      ) {
     return Container(
-      width: context.getScreenWidth*.9,
-      height: context.getScreenHeight*.4,
+      width: context.getScreenWidth * .9,
+      height: context.getScreenHeight * .4,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: gradientColors,
@@ -411,6 +484,31 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
               ),
             ),
           ),
+          // Voice button (top right)
+          if (showVoiceButton)
+            Positioned(
+              top: 20,
+              right: 20,
+              child: GestureDetector(
+                onTap: widget.onSpeak,
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    widget.isSpeaking ? Icons.volume_up_rounded : Icons.volume_up_outlined,
+                    size: 28,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
           // Content
           Center(
             child: Padding(
