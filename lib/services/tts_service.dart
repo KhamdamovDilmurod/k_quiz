@@ -14,7 +14,7 @@ class TtsService {
 
       // Asosiy sozlamalar
       await _flutterTts.setVolume(1.0); // Ovoz balandligi (0.0 - 1.0)
-      await _flutterTts.setPitch(2.0); // Ovoz toni (0.5 - 2.0)
+      await _flutterTts.setPitch(1.0); // Ovoz toni (0.5 - 2.0)
       await _flutterTts.setSpeechRate(0.5); // Gapirish tezligi (0.0 - 1.0)
 
       _isInitialized = true;

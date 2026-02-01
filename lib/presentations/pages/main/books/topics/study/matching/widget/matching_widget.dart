@@ -451,9 +451,10 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
       children: [
         // Header with timer and score
         Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.05,
-            vertical: screenHeight * 0.015,
+          padding: EdgeInsets.only(
+            left: screenWidth * 0.05,
+            right: screenWidth * 0.05,
+            top: 8
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -536,7 +537,6 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
             ],
           ),
         ),
-
         // Grid of cards
         Expanded(
           child: GridView.builder(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/matching/matching_page.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/test/test_page.dart';
+import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_page.dart';
+import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_widgets.dart';
 import '../../../../../../utils/colors.dart';
 import '../../../../../ui/common/custom_appbar.dart';
 import '../../../../../ui/common/learning_method_card.dart';
@@ -111,8 +113,12 @@ class LearningMethodScreen extends StatelessWidget {
                   const Color(0xFFEF4444),
                 ],
                 onTap: () {
-                  // Yozish sahifasiga o'tish
-                  print('Yozish tanlandi');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => WritingPage(topicId:topicId),
+                    ),
+                  );
                 },
               ),
               const SizedBox(height: 16),
