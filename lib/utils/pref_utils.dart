@@ -6,6 +6,8 @@ class PrefUtils {
 
   static const _prefToken = "token";
   static const _prefFCMToken = "fcm_token";
+
+  static const _isRegistered = "is_registered";
   static const _prefUser = "user";
   static const _prefSaved = "saved";
   static const _prefLangType = "lang_type";
@@ -30,6 +32,14 @@ class PrefUtils {
 
   Future<bool> setToken(String value) async {
     return _shared.setString(_prefToken, value);
+  }
+
+  bool isRegistered() {
+    return _shared.getBool(_isRegistered) ?? false;
+  }
+
+  Future<bool> register(bool value) async {
+    return _shared.setBool(_isRegistered, value);
   }
 
   //

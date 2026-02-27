@@ -2,7 +2,9 @@ import 'package:get_it/get_it.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../data/network/database_helper.dart';
+import '../data/repositories/firebase_auth_repository.dart';
 import '../data/repositories/word_repository.dart';
+import '../services/firebase_auth_service.dart';
 import '../services/google_sheets_service.dart';
 import '../services/tts_service.dart';
 import '../utils/pref_utils.dart';
@@ -31,7 +33,14 @@ Future<void> setupDependencies() async {
           () => GoogleSheetsService(getIt<Database>())
   );
 
-
+// AUTH - Yangi qo'shildi
+  getIt.registerLazySingleton<FirebaseAuthService>(
+        () => FirebaseAuthService(),
+  );
+  // Repositories
+  getIt.registerLazySingleton<AuthRepository>(
+          () => AuthRepository(getIt<FirebaseAuthService>())
+  );
   // TTS Service - Singleton sifatida
   getIt.registerLazySingleton<TtsService>(() => TtsService());
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/presentations/pages/auth2/login_screen.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/topics_page.dart';
 import 'package:k_quiz/utils/colors.dart';
 
@@ -9,6 +10,7 @@ import '../../../ui/common/animated_drawer.dart';
 import '../../../ui/common/custom_appbar.dart';
 import '../../../ui/common/empty_state.dart';
 import '../../../ui/widget/books_item_view.dart';
+import '../../auth2/auth_bloc.dart';
 import 'books_bloc.dart';
 
 class BooksScreen extends StatelessWidget {
@@ -26,11 +28,11 @@ class BooksScreen extends StatelessWidget {
 Widget _buildPage(BuildContext context) {
   return Scaffold(
     backgroundColor: AppColors.backgroundColor,
-    drawer: AnimatedDrawer(), // Drawer qo'shildi
+    drawer: AnimatedDrawer(onLogout: () => _showLogoutDialog(context),),
     appBar: CustomAppBar(
       title: "Kitoblar ro'yxati",
       backgroundColor: AppColors.backgroundColor,
-      showMenuButton: true, // Menu tugmasini yoqish
+      showMenuButton: true,
     ),
     body: SafeArea(
       child: BlocBuilder<BooksBloc, BaseState>(
@@ -73,6 +75,38 @@ Widget _buildPage(BuildContext context) {
           );
         },
       ),
+    ),
+  );
+}
+
+void _showLogoutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      title: Text('Chiqish'),
+      content: Text('Haqiqatan ham chiqmoqchimisiz?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(dialogContext),
+          child: Text('Yo\'q'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(dialogContext);
+            // AuthBloc-ga signout event yuborish
+            context.read<AuthBloc>().add(AuthSignOutRequested());
+            // Barcha sahifalarni tozalash va login sahifasiga o'tish
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => LoginScreen()),
+                  (route) => false,
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+          ),
+          child: Text('Ha, chiqish'),
+        ),
+      ],
     ),
   );
 }

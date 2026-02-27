@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/utils/colors.dart';
 
+import '../../pages/auth2/auth_bloc.dart';
 import '../../pages/main/books/topics/screens.dart';
 
 class AnimatedDrawer extends StatefulWidget {
-  final String? currentRoute; // Joriy sahifa route'i
 
-  const AnimatedDrawer({super.key, this.currentRoute});
+  final String? currentRoute;
+  final VoidCallback? onLogout; // Joriy sahifa route'i
+
+  const AnimatedDrawer({super.key, this.currentRoute, this.onLogout});
 
   @override
   State<AnimatedDrawer> createState() => _AnimatedDrawerState();
@@ -144,6 +147,23 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                             ),
                           );
                         });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuItem(
+                      icon: Icons.login_outlined,
+                      title: 'log out',
+                      gradientColors: [
+                        const Color(0xFFEC4899),
+                        const Color(0xFFDB2777),
+                      ],
+                      isSelected: selectedItem == 'log out',
+                      onTap: () {
+                        setState(() => selectedItem = 'log out');
+                        Navigator.pop(context);
+                        if (widget.onLogout != null) {
+                          widget.onLogout!();
+                        }
                       },
                     ),
                     const SizedBox(height: 32),
@@ -349,4 +369,5 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
       ),
     );
   }
+
 }
