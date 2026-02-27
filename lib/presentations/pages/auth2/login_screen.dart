@@ -38,6 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
         builder: (context, state) {
           final isLoading = state is AuthLoading;
 
+
           return Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
