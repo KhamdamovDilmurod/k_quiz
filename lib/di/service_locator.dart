@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../config/theme_controller.dart';
 import '../data/network/database_helper.dart';
 import '../data/repositories/firebase_auth_repository.dart';
 import '../data/repositories/word_repository.dart';
@@ -23,6 +24,10 @@ Future<void> setupDependencies() async {
   getIt.registerSingleton<PrefUtils>(prefUtils);
   /// ishlatilinishi   ->    getIt<PrefUtils>().setToken("");
 
+  final themeController = ThemeController(prefUtils);
+  await themeController.load();
+  getIt.registerSingleton<ThemeController>(themeController);
+
   // Repositories
   getIt.registerLazySingleton<WordRepository>(
           () => WordRepository(getIt<Database>())
@@ -39,7 +44,7 @@ Future<void> setupDependencies() async {
   );
   // Repositories
   getIt.registerLazySingleton<AuthRepository>(
-          () => AuthRepository(getIt<FirebaseAuthService>())
+          () => AuthRepository(getIt<FirebaseAuthService>(), getIt<PrefUtils>())
   );
   // TTS Service - Singleton sifatida
   getIt.registerLazySingleton<TtsService>(() => TtsService());
@@ -48,4 +53,3 @@ Future<void> setupDependencies() async {
   await getIt<TtsService>().initialize();
 
 }
-

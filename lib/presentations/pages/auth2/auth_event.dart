@@ -20,7 +20,13 @@ class AuthSignInRequested extends AuthEvent {
 class AuthRegisterRequested extends AuthEvent {
   final String email;
   final String password;
-  AuthRegisterRequested(this.email, this.password);
+  final String? displayName;
+  AuthRegisterRequested(this.email, this.password, {this.displayName});
+}
+
+class AuthGoogleSignInRequested extends AuthEvent {
+  final String? displayName;
+  AuthGoogleSignInRequested({this.displayName});
 }
 
 class AuthSignOutRequested extends AuthEvent {}

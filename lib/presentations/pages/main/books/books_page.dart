@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:k_quiz/presentations/pages/auth2/login_screen.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/topics_page.dart';
 import 'package:k_quiz/utils/colors.dart';
+import 'package:k_quiz/utils/pref_utils.dart';
 
 import '../../../../data/bloc/base/base_state.dart';
 import '../../../../di/service_locator.dart';
@@ -26,11 +27,16 @@ class BooksScreen extends StatelessWidget {
 }
 
 Widget _buildPage(BuildContext context) {
+  final user = getIt<PrefUtils>().getUserData();
+  final appBarTitle = (user?.displayName?.trim().isNotEmpty ?? false)
+      ? "Kitoblar - ${user!.displayName!.trim()}"
+      : "Kitoblar ro'yxati";
+
   return Scaffold(
     backgroundColor: AppColors.backgroundColor,
     drawer: AnimatedDrawer(onLogout: () => _showLogoutDialog(context),),
     appBar: CustomAppBar(
-      title: "Kitoblar ro'yxati",
+      title: appBarTitle,
       backgroundColor: AppColors.backgroundColor,
       showMenuButton: true,
     ),

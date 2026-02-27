@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/data/models/user_model.dart';
+import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/utils/colors.dart';
+import 'package:k_quiz/utils/pref_utils.dart';
 
-import '../../pages/auth2/auth_bloc.dart';
 import '../../pages/main/books/topics/screens.dart';
 
 class AnimatedDrawer extends StatefulWidget {
@@ -17,6 +19,7 @@ class AnimatedDrawer extends StatefulWidget {
 
 class _AnimatedDrawerState extends State<AnimatedDrawer> {
   String selectedItem = 'Kitoblar'; // Default tanlangan item
+  UserModel? get _user => getIt<PrefUtils>().getUserData();
 
   @override
   void initState() {
@@ -152,14 +155,14 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.login_outlined,
-                      title: 'log out',
+                      title: 'Chiqish',
                       gradientColors: [
                         const Color(0xFFEC4899),
                         const Color(0xFFDB2777),
                       ],
-                      isSelected: selectedItem == 'log out',
+                      isSelected: selectedItem == 'Chiqish',
                       onTap: () {
-                        setState(() => selectedItem = 'log out');
+                        setState(() => selectedItem = 'Chiqish');
                         Navigator.pop(context);
                         if (widget.onLogout != null) {
                           widget.onLogout!();
@@ -196,6 +199,15 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
   }
 
   Widget _buildHeader() {
+    final user = _user;
+    final userName = (user?.displayName?.trim().isNotEmpty ?? false)
+        ? user!.displayName!.trim()
+        : 'Foydalanuvchi';
+    final userEmail = (user?.email?.trim().isNotEmpty ?? false)
+        ? user!.email!.trim()
+        : 'Email topilmadi';
+    final userPhotoUrl = user?.photoURL;
+
     return Container(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -219,15 +231,27 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.person_rounded,
-              color: Colors.white,
-              size: 40,
+            child: ClipOval(
+              child: userPhotoUrl != null && userPhotoUrl.isNotEmpty
+                  ? Image.network(
+                userPhotoUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(
+                  Icons.person_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              )
+                  : const Icon(
+                Icons.person_rounded,
+                color: Colors.white,
+                size: 40,
+              ),
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'Foydalanuvchi',
+          Text(
+            userName,
             style: TextStyle(
               color: Colors.black,
               fontSize: 20,
@@ -236,7 +260,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           ),
           const SizedBox(height: 4),
           Text(
-            'user@example.com',
+            userEmail,
             style: TextStyle(
               color: Colors.black.withOpacity(0.7),
               fontSize: 14,

@@ -30,6 +30,7 @@ dependencies:
   firebase_analytics: ^12.1.2
   firebase_storage: ^13.0.6
   cloud_firestore: ^6.1.2
+  google_sign_in: ^7.2.0
   go_router:
   pinput:
   intl_phone_field:

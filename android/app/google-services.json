@@ -12,7 +12,20 @@
           "package_name": "hamdam_app.uz.k_quiz"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "722574337708-fvhupr9hcurbbgb4i64ajv0ptmkuashl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hamdam_app.uz.k_quiz",
+            "certificate_hash": "0263085cad749769d5242a649a55cdba866ac740"
+          }
+        },
+        {
+          "client_id": "722574337708-vgqj2f35rjhc4enal250gd8eauns2d6p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBAWrEs9uAr9avtJ6jAJOuC7S3nZej1SGg"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "722574337708-vgqj2f35rjhc4enal250gd8eauns2d6p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

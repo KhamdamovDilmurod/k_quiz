@@ -1,9 +1,11 @@
 // splash/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/presentations/pages/auth2/login_screen.dart';
 import 'package:k_quiz/presentations/pages/main/books/books_page.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/services/google_sheets_service.dart';
+import 'package:k_quiz/utils/pref_utils.dart';
 import 'splash_cubit.dart';
 
 class SplashPage extends StatelessWidget {
@@ -26,13 +28,16 @@ class SplashView extends StatelessWidget {
     return BlocListener<SplashCubit, SplashState>(
       listener: (context, state) {
         if (state.status == SplashStatus.success) {
+          final savedUser = getIt<PrefUtils>().getUserData();
+          final nextPage = savedUser != null ? const BooksScreen() : const LoginScreen();
+
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) => BooksScreen(),
+              pageBuilder: (context, animation, secondaryAnimation) => nextPage,
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(opacity: animation, child: child);
               },
-              transitionDuration: Duration(milliseconds: 500),
+              transitionDuration: const Duration(milliseconds: 500),
             ),
           );
         }

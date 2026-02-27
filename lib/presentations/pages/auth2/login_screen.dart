@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/di/service_locator.dart';
+import 'package:k_quiz/services/firebase_auth_service.dart';
+import 'package:k_quiz/presentations/pages/auth2/registr_screen.dart';
 import 'auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,6 +19,35 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isGoogleLoading = false;
+
+  Future<void> _continueWithGoogle() async {
+    setState(() => _isGoogleLoading = true);
+    try {
+      final profile = await getIt<FirebaseAuthService>().pickGoogleProfile();
+      if (!mounted || profile == null) return;
+
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => RegisterScreen(
+            initialEmail: profile.email,
+            initialDisplayName: profile.displayName,
+            initialPhotoUrl: profile.photoUrl,
+            isGoogleFlow: true,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isGoogleLoading = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -34,9 +66,13 @@ class _LoginScreenState extends State<LoginScreen> {
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           }
+
+          if (state is AuthAuthenticated) {
+            Navigator.pushNamedAndRemoveUntil(context, '/books', (route) => false);
+          }
         },
         builder: (context, state) {
-          final isLoading = state is AuthLoading;
+          final isLoading = state is AuthLoading || _isGoogleLoading;
 
 
           return Container(
@@ -186,6 +222,38 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton.icon(
+                            onPressed: isLoading ? null : _continueWithGoogle,
+                            icon: _isGoogleLoading
+                                ? SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                                : Icon(Icons.g_mobiledata, size: 28, color: Colors.white),
+                            label: Text(
+                              'Google bilan davom etish',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.white70),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

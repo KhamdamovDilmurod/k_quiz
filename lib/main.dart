@@ -26,6 +26,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:k_quiz/config/theme_config.dart';
+import 'package:k_quiz/config/theme_controller.dart';
 import 'package:k_quiz/presentations/pages/auth2/auth_bloc.dart';
 import 'package:k_quiz/presentations/pages/auth2/login_screen.dart';
 import 'package:k_quiz/presentations/pages/auth2/registr_screen.dart';
@@ -46,16 +48,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeController = getIt<ThemeController>();
+
     return BlocProvider(
       create: (context) => AuthBloc(getIt.get()),
-      child: MaterialApp(
-        title: 'Korean Quiz',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          useMaterial3: true,
+      child: AnimatedBuilder(
+        animation: themeController,
+        builder: (context, _) => MaterialApp(
+          title: 'Korean Quiz',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeConfig.lightTheme,
+          darkTheme: ThemeConfig.darkTheme,
+          themeMode: themeController.themeMode,
+          routes: {
+            '/login': (_) => const LoginScreen(),
+            '/register': (_) => const RegisterScreen(),
+            '/books': (_) => const BooksScreen(),
+          },
+          home: const SplashPage(),
         ),
-        home: SplashPage(),
       ),
     );
   }

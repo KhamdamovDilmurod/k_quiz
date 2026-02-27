@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../data/models/user_model.dart';
 
 class PrefUtils {
   late SharedPreferences _shared;
@@ -12,6 +14,7 @@ class PrefUtils {
   static const _prefSaved = "saved";
   static const _prefLangType = "lang_type";
   static const _prefPhoneCode = "phone_code";
+  static const _prefThemeMode = "theme_mode";
 
   Future<bool> init() async {
     _shared = await SharedPreferences.getInstance();
@@ -42,16 +45,40 @@ class PrefUtils {
     return _shared.setBool(_isRegistered, value);
   }
 
-  //
-  // AppUserModel? getUserData() {
-  //   var data = _shared.getString(_prefUser);
-  //   return data == null ? null : AppUserModel.fromJson(jsonDecode(data));
-  // }
-  //
-  // Future<bool> setUserInfo(AppUserModel? value) async {
-  //   return _shared.setString(_prefUser, jsonEncode(value?.toJson()));
-  // }
-  //
+  UserModel? getUserData() {
+    final data = _shared.getString(_prefUser);
+    if (data == null || data.isEmpty) return null;
+
+    try {
+      return UserModel.fromJson(jsonDecode(data) as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<bool> setUserInfo(UserModel? value) async {
+    if (value == null) {
+      return _shared.remove(_prefUser);
+    }
+    return _shared.setString(_prefUser, jsonEncode(value.toJson()));
+  }
+
+  ThemeMode getThemeMode() {
+    final value = _shared.getString(_prefThemeMode) ?? 'system';
+    switch (value) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
+    }
+  }
+
+  Future<bool> setThemeMode(ThemeMode mode) {
+    return _shared.setString(_prefThemeMode, mode.name);
+  }
+
   // LangType getCurrentLang() {
   //   return LangType.getObj(_shared.getString(_prefLangType) ?? LangType.uz.getKey());
   // }
