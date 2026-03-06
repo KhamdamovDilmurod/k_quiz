@@ -4,6 +4,7 @@ import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_
 import 'package:k_quiz/utils/extensions.dart';
 
 import '../../../../../../../../data/models/word.dart';
+import '../../../../../../../../data/repositories/word_repository.dart';
 import '../../../../../../../../di/service_locator.dart';
 import '../../../../../../../ui/common/gradient_card.dart';
 import '../../../../../../../../services/tts_service.dart';
@@ -22,14 +23,18 @@ class FlashcardsWidget extends StatefulWidget {
 class _FlashcardsWidgetState extends State<FlashcardsWidget> {
   late PageController _pageController;
   late DateTime _startedAt;
+  final WordRepository _wordRepository = getIt<WordRepository>();
+  final Set<int> _savedWordIds = <int>{};
   int currentIndex = 0;
   bool isFlipped = false;
+  bool _isSavingWord = false;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
     _startedAt = DateTime.now();
+    _loadSavedWords();
   }
 
   @override
@@ -69,6 +74,57 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
       currentIndex = index;
       isFlipped = false;
     });
+  }
+
+  Future<void> _loadSavedWords() async {
+    final savedIds = <int>{};
+    for (final word in widget.words) {
+      final isSaved = await _wordRepository.isWordSaved(word.id);
+      if (isSaved) {
+        savedIds.add(word.id);
+      }
+    }
+    if (!mounted) return;
+    setState(() {
+      _savedWordIds
+        ..clear()
+        ..addAll(savedIds);
+    });
+  }
+
+  Future<void> _toggleCurrentWordSaved() async {
+    if (_isSavingWord || widget.words.isEmpty) return;
+    final wordId = widget.words[currentIndex].id;
+
+    setState(() => _isSavingWord = true);
+    final alreadySaved = _savedWordIds.contains(wordId);
+    final success = alreadySaved
+        ? await _wordRepository.removeFromSaved(wordId)
+        : await _wordRepository.addToSaved(wordId);
+
+    if (!mounted) return;
+
+    if (success) {
+      setState(() {
+        if (alreadySaved) {
+          _savedWordIds.remove(wordId);
+        } else {
+          _savedWordIds.add(wordId);
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            alreadySaved
+                ? 'So\'z saqlanganlardan olib tashlandi'
+                : 'So\'z saqlandi',
+          ),
+          duration: const Duration(milliseconds: 1200),
+        ),
+      );
+    }
+
+    setState(() => _isSavingWord = false);
   }
 
   void _showResults() {
@@ -145,13 +201,19 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                       color: Color(0xFF6B7280),
                     ),
                   ),
-                  Text(
-                    '${((currentIndex + 1) / widget.words.length * 100).toInt()}%',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B46C1),
-                    ),
+                  Row(
+                    children: [
+                      _buildSaveButton(),
+                      const SizedBox(width: 10),
+                      Text(
+                        '${((currentIndex + 1) / widget.words.length * 100).toInt()}%',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF6B46C1),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -258,6 +320,36 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSaveButton() {
+    final currentWordId = widget.words[currentIndex].id;
+    final isSaved = _savedWordIds.contains(currentWordId);
+
+    return GestureDetector(
+      onTap: _toggleCurrentWordSaved,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        width: 34,
+        height: 34,
+        decoration: BoxDecoration(
+          color: isSaved
+              ? const Color(0xFFF59E0B).withOpacity(0.16)
+              : const Color(0xFFE5E7EB),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: _isSavingWord
+            ? const Padding(
+                padding: EdgeInsets.all(8),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Icon(
+                isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                color: isSaved ? const Color(0xFFF59E0B) : const Color(0xFF6B7280),
+                size: 20,
+              ),
+      ),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/data/models/user_model.dart';
 import 'package:k_quiz/di/service_locator.dart';
+import 'package:k_quiz/presentations/pages/main/saved/saved_words_page.dart';
 import 'package:k_quiz/utils/colors.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
 
@@ -110,8 +111,14 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       isSelected: selectedItem == 'Sevimlilar',
                       onTap: () {
                         setState(() => selectedItem = 'Sevimlilar');
-                        Future.delayed(const Duration(milliseconds: 300), () {
-                          Navigator.pop(context);
+                        Navigator.pop(context);
+                        Future.delayed(const Duration(milliseconds: 250), () {
+                          if (!mounted) return;
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const SavedWordsPage(),
+                            ),
+                          );
                         });
                       },
                     ),

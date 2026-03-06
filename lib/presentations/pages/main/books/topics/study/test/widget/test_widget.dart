@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/data/models/word.dart';
+import 'package:k_quiz/data/repositories/word_repository.dart';
+import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 import 'package:k_quiz/utils/extensions.dart';
 
@@ -177,16 +179,20 @@ class TestQuizWidget extends StatefulWidget {
 }
 
 class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStateMixin {
+  final WordRepository _wordRepository = getIt<WordRepository>();
+  final Set<int> _savedWordIds = <int>{};
   int currentQuestion = 0;
   int score = 0;
   int? selectedAnswer;
   List<int> correctAnswers = [];
   AnimationController? _timerController;
   List<String> options = [];
+  bool _isSavingWord = false;
 
   @override
   void initState() {
     super.initState();
+    _loadSavedWords();
     _generateOptions();
     if (widget.timeLimit != null) {
       _timerController = AnimationController(
@@ -199,6 +205,58 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
       });
       _timerController!.forward();
     }
+  }
+
+  Future<void> _loadSavedWords() async {
+    final savedIds = <int>{};
+    for (final word in widget.words) {
+      final isSaved = await _wordRepository.isWordSaved(word.id);
+      if (isSaved) {
+        savedIds.add(word.id);
+      }
+    }
+    if (!mounted) return;
+    setState(() {
+      _savedWordIds
+        ..clear()
+        ..addAll(savedIds);
+    });
+  }
+
+  Future<void> _toggleCurrentWordSaved() async {
+    if (_isSavingWord || widget.words.isEmpty) return;
+    final currentWord = widget.words[currentQuestion];
+    final wordId = currentWord.id;
+
+    setState(() => _isSavingWord = true);
+    final alreadySaved = _savedWordIds.contains(wordId);
+    final success = alreadySaved
+        ? await _wordRepository.removeFromSaved(wordId)
+        : await _wordRepository.addToSaved(wordId);
+
+    if (!mounted) return;
+
+    if (success) {
+      setState(() {
+        if (alreadySaved) {
+          _savedWordIds.remove(wordId);
+        } else {
+          _savedWordIds.add(wordId);
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            alreadySaved
+                ? 'So\'z saqlanganlardan olib tashlandi'
+                : 'So\'z saqlandi',
+          ),
+          duration: const Duration(milliseconds: 1200),
+        ),
+      );
+    }
+
+    setState(() => _isSavingWord = false);
   }
 
   void _generateOptions() {
@@ -259,7 +317,7 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
             ? const Color(0xFF10B981)
             : const Color(0xFFF59E0B),
         lottieAssetPath: percentage >= 70
-            ? 'assets/lotties/celeberate.json'
+            ? 'assets/lotties/satisification.json'
             : 'assets/lotties/unstatification.json',
         title: 'Test yakunlandi!',
         metrics: [
@@ -331,6 +389,8 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
                   ),
                 ),
               ),
+              const SizedBox(width: 8),
+              _buildSaveButton(currentWord.id),
             ],
           ),
         ),
@@ -447,6 +507,33 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSaveButton(int wordId) {
+    final isSaved = _savedWordIds.contains(wordId);
+    return GestureDetector(
+      onTap: _toggleCurrentWordSaved,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: isSaved
+              ? const Color(0xFFF59E0B).withOpacity(0.16)
+              : const Color(0xFFE5E7EB),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: _isSavingWord
+            ? const Padding(
+                padding: EdgeInsets.all(10),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : Icon(
+                isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                color: isSaved ? const Color(0xFFF59E0B) : const Color(0xFF6B7280),
+              ),
+      ),
     );
   }
 }
