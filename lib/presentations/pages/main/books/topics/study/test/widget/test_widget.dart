@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/data/models/word.dart';
+import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 import 'package:k_quiz/utils/extensions.dart';
 
 import '../../../../../../../ui/common/gradient_card.dart';
@@ -253,97 +254,34 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: percentage >= 70
-                        ? [
-                      const Color(0xFF10B981).withOpacity(0.2),
-                      const Color(0xFF059669).withOpacity(0.2),
-                    ]
-                        : [
-                      const Color(0xFFF59E0B).withOpacity(0.2),
-                      const Color(0xFFEF4444).withOpacity(0.2),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  percentage >= 70 ? Icons.celebration_rounded : Icons.sentiment_satisfied_rounded,
-                  size: 64,
-                  color: percentage >= 70 ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Test yakunlandi!',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF9FAFB),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      '$score / ${widget.words.length}',
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1F2937),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${percentage.toStringAsFixed(1)}%',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: percentage >= 70 ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              GradientCard(
-                margin: EdgeInsets.zero,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                borderRadius: 12,
-                gradientColors: const [
-                  Color(0xFF6B46C1),
-                  Color(0xFF9333EA),
-                ],
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Yopish',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
+      builder: (context) => StudyResultDialog(
+        accentColor: percentage >= 70
+            ? const Color(0xFF10B981)
+            : const Color(0xFFF59E0B),
+        lottieAssetPath: percentage >= 70
+            ? 'assets/lotties/celeberate.json'
+            : 'assets/lotties/unstatification.json',
+        title: 'Test yakunlandi!',
+        metrics: [
+          StudyResultMetric(
+            value: '$score / ${widget.words.length}',
+            label: 'Natija',
           ),
+          StudyResultMetric(
+            value: '${percentage.toStringAsFixed(1)}%',
+            label: 'Foiz',
+          ),
+        ],
+        primaryAction: StudyResultAction(
+          label: 'Yopish',
+          gradientColors: const [
+            Color(0xFF6B46C1),
+            Color(0xFF9333EA),
+          ],
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
         ),
       ),
     );

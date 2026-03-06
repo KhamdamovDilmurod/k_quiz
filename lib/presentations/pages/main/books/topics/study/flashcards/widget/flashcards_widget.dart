@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 import 'package:k_quiz/utils/extensions.dart';
 
 import '../../../../../../../../data/models/word.dart';
@@ -20,6 +21,7 @@ class FlashcardsWidget extends StatefulWidget {
 
 class _FlashcardsWidgetState extends State<FlashcardsWidget> {
   late PageController _pageController;
+  late DateTime _startedAt;
   int currentIndex = 0;
   bool isFlipped = false;
 
@@ -27,6 +29,7 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
   void initState() {
     super.initState();
     _pageController = PageController();
+    _startedAt = DateTime.now();
   }
 
   @override
@@ -44,6 +47,14 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
     }
   }
 
+  void _handleNextAction() {
+    if (currentIndex < widget.words.length - 1) {
+      _nextCard();
+      return;
+    }
+    _showResults();
+  }
+
   void _previousCard() {
     if (currentIndex > 0) {
       _pageController.previousPage(
@@ -57,6 +68,59 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
     setState(() {
       currentIndex = index;
       isFlipped = false;
+    });
+  }
+
+  void _showResults() {
+    final completionSeconds = DateTime.now().difference(_startedAt).inSeconds;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StudyResultDialog(
+        accentColor: const Color(0xFF3B82F6),
+        lottieAssetPath: 'assets/lotties/celeberate.json',
+        title: 'Flashcard yakunlandi!',
+        subtitle: '${widget.words.length} ta kartochkani ko\'rib chiqdingiz',
+        metrics: [
+          StudyResultMetric(
+            value: '${widget.words.length}',
+            label: 'Kartochka',
+          ),
+          StudyResultMetric(
+            value: '${completionSeconds}s',
+            label: 'Vaqt',
+          ),
+        ],
+        primaryAction: StudyResultAction(
+          label: 'Yopish',
+          gradientColors: const [
+            Color(0xFF6B46C1),
+            Color(0xFF9333EA),
+          ],
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+        secondaryAction: StudyResultAction(
+          label: 'Qayta',
+          gradientColors: const [
+            Color(0xFF6B7280),
+            Color(0xFF4B5563),
+          ],
+          onTap: _restartFlashcards,
+        ),
+      ),
+    );
+  }
+
+  void _restartFlashcards() {
+    Navigator.pop(context);
+    _pageController.jumpToPage(0);
+    setState(() {
+      currentIndex = 0;
+      isFlipped = false;
+      _startedAt = DateTime.now();
     });
   }
 
@@ -176,10 +240,14 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
               const SizedBox(width: 16),
               Expanded(
                 child: _buildNavButton(
-                  icon: Icons.arrow_forward_rounded,
-                  label: 'Keyingi',
-                  isEnabled: currentIndex < widget.words.length - 1,
-                  onPressed: _nextCard,
+                  icon: currentIndex < widget.words.length - 1
+                      ? Icons.arrow_forward_rounded
+                      : Icons.check_circle_rounded,
+                  label: currentIndex < widget.words.length - 1
+                      ? 'Keyingi'
+                      : 'Yakunlash',
+                  isEnabled: true,
+                  onPressed: _handleNextAction,
                   gradientColors: [
                     const Color(0xFF6B46C1),
                     const Color(0xFF9333EA),

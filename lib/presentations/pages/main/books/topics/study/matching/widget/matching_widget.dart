@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/data/models/word.dart';
-import '../../../../../../../ui/common/gradient_card.dart';
+import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 
 class MatchingWidget extends StatefulWidget {
   final List<Word> words;
@@ -178,220 +178,65 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
     }
   }
 
-  IconData _getPerformanceIcon(int seconds) {
-    final wordsCount = allCards.length ~/ 2;
-    final avgTimePerWord = seconds / wordsCount;
-    if (avgTimePerWord <= 3) {
-      return Icons.emoji_events_rounded;
-    } else if (avgTimePerWord <= 5) {
-      return Icons.celebration_rounded;
-    } else if (avgTimePerWord <= 7) {
-      return Icons.sentiment_very_satisfied_rounded;
-    } else {
-      return Icons.sentiment_satisfied_rounded;
-    }
-  }
-
   void _showResults(int completionTime) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        child: Container(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      const Color(0xFF10B981).withOpacity(0.2),
-                      const Color(0xFF059669).withOpacity(0.2),
-                    ],
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  _getPerformanceIcon(completionTime),
-                  size: 64,
-                  color: const Color(0xFF10B981),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                _getPerformanceText(completionTime),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${allCards.length ~/ 2} ta so\'zni to\'g\'ri moslashtirdingiz',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF6B7280),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF9FAFB),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(
-                            Icons.timer_outlined,
-                            color: Color(0xFF6B46C1),
-                            size: 28,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '${completionTime}s',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Vaqt',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF9FAFB),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Color(0xFF10B981),
-                            size: 28,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '$score',
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F2937),
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Ball',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF6B7280),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: GradientCard(
-                      margin: EdgeInsets.zero,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      borderRadius: 12,
-                      gradientColors: const [
-                        Color(0xFF6B7280),
-                        Color(0xFF4B5563),
-                      ],
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          matchedIndices.clear();
-                          score = 0;
-                          selectedIndex = null;
-                          wrongIndex = null;
-                          isCompleted = false;
-                          startTime = DateTime.now();
-                          elapsedSeconds = 0;
-                          _isInitialized = false;
-                        });
-                        _startTimer();
-                        // didChangeDependencies will call _initializeCards
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          if (mounted) {
-                            setState(() {
-                              _initializeCards();
-                            });
-                          }
-                        });
-                      },
-                      child: const Text(
-                        'Qayta',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: GradientCard(
-                      margin: EdgeInsets.zero,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      borderRadius: 12,
-                      gradientColors: const [
-                        Color(0xFF6B46C1),
-                        Color(0xFF9333EA),
-                      ],
-                      onTap: () {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        'Yopish',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      builder: (context) => StudyResultDialog(accentColor: const Color(0xFF10B981),
+        lottieAssetPath: 'assets/lotties/celeberate.json',
+        title: _getPerformanceText(completionTime),
+        subtitle: '${allCards.length ~/ 2} ta so\'zni to\'g\'ri moslashtirdingiz',
+        metrics: [
+          StudyResultMetric(
+            value: '${completionTime}s',
+            label: 'Vaqt',
           ),
+          StudyResultMetric(
+            value: '$score',
+            label: 'Ball',
+          ),
+        ],
+        primaryAction: StudyResultAction(
+          label: 'Yopish',
+          gradientColors: const [
+            Color(0xFF6B46C1),
+            Color(0xFF9333EA),
+          ],
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.pop(context);
+          },
+        ),
+        secondaryAction: StudyResultAction(
+          label: 'Qayta',
+          gradientColors: const [
+            Color(0xFF6B7280),
+            Color(0xFF4B5563),
+          ],
+          onTap: _restartGame,
         ),
       ),
     );
+  }
+
+  void _restartGame() {
+    Navigator.pop(context);
+    setState(() {
+      matchedIndices.clear();
+      score = 0;
+      selectedIndex = null;
+      wrongIndex = null;
+      isCompleted = false;
+      startTime = DateTime.now();
+      elapsedSeconds = 0;
+      _isInitialized = false;
+    });
+    _startTimer();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(_initializeCards);
+      }
+    });
   }
 
   String _formatTime(int seconds) {
