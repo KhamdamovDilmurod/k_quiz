@@ -201,19 +201,13 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                       color: Color(0xFF6B7280),
                     ),
                   ),
-                  Row(
-                    children: [
-                      _buildSaveButton(),
-                      const SizedBox(width: 10),
-                      Text(
-                        '${((currentIndex + 1) / widget.words.length * 100).toInt()}%',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF6B46C1),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    '${((currentIndex + 1) / widget.words.length * 100).toInt()}%',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF6B46C1),
+                    ),
                   ),
                 ],
               ),
@@ -243,6 +237,7 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                   child: FlashcardItem(
                     word: widget.words[index],
                     isCurrentCard: index == currentIndex,
+                    saveButton: index == currentIndex ? _buildSaveButton() : null,
                   ),
                 ),
               );
@@ -399,11 +394,13 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
 class FlashcardItem extends StatefulWidget {
   final Word word;
   final bool isCurrentCard;
+  final Widget? saveButton;
 
   const FlashcardItem({
     super.key,
     required this.word,
     required this.isCurrentCard,
+    this.saveButton,
   });
 
   @override
@@ -498,6 +495,7 @@ class _FlashcardItemState extends State<FlashcardItem> {
         backText: widget.word.uzbekWord ?? '',
         onSpeak: _speak,
         isSpeaking: isSpeaking,
+        saveButton: widget.saveButton,
       ),
     );
   }
@@ -510,6 +508,7 @@ class FlipCard extends StatefulWidget {
   final String backText;
   final VoidCallback onSpeak;
   final bool isSpeaking;
+  final Widget? saveButton;
 
   const FlipCard({
     super.key,
@@ -518,6 +517,7 @@ class FlipCard extends StatefulWidget {
     required this.backText,
     required this.onSpeak,
     required this.isSpeaking,
+    this.saveButton,
   });
 
   @override
@@ -648,7 +648,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
           if (showVoiceButton)
             Positioned(
               top: 20,
-              right: 20,
+              left: 20,
               child: GestureDetector(
                 onTap: widget.onSpeak,
                 child: Container(
@@ -668,6 +668,12 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                   ),
                 ),
               ),
+            ),
+          if (showVoiceButton && widget.saveButton != null)
+            Positioned(
+              top: 20,
+              right: 20,
+              child: widget.saveButton!,
             ),
           // Content
           Center(

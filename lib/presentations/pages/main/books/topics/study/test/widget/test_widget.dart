@@ -3,7 +3,6 @@ import 'package:k_quiz/data/models/word.dart';
 import 'package:k_quiz/data/repositories/word_repository.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
-import 'package:k_quiz/utils/extensions.dart';
 
 import '../../../../../../../ui/common/gradient_card.dart';
 import '../../../../../../../ui/common/quiz_option_card.dart';
@@ -389,8 +388,6 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              _buildSaveButton(currentWord.id),
             ],
           ),
         ),
@@ -418,6 +415,7 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
           ),
         const SizedBox(height: 10),
         Container(
+          width: double.infinity,
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
@@ -435,30 +433,41 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
               ),
             ],
           ),
-          child: Column(
+          child: Stack(
             children: [
-              Container(
-                width: context.getScreenWidth*.9,
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.translate_rounded,
-                  color: Colors.white,
-                  size: 24,
-                ),
+              Positioned(
+                top: 0,
+                right: 0,
+                child: _buildSaveButton(currentWord.id),
               ),
-              const SizedBox(height: 8),
-              Text(
-                currentWord.koreanWord ?? '',
-                style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              Align(
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.translate_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      currentWord.koreanWord ?? '',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),

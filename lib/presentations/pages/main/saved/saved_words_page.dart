@@ -30,6 +30,15 @@ Widget _buildPage(BuildContext context) {
         icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
         onPressed: () => Navigator.pop(context),
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 18.0),
+          child: IconButton(
+            icon: const Icon(Icons.videogame_asset_rounded, color: Color(0xFF1F2937)),
+            onPressed: () => Navigator.pop(context),
+          ),
+        )
+      ],
     ),
     body: SafeArea(
       child: BlocListener<SavedWordsBloc, BaseState>(
