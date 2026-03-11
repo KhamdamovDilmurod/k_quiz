@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/data/models/word.dart';
+import 'package:k_quiz/data/repositories/study_progress_repository.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
+import 'package:k_quiz/di/service_locator.dart';
 
 class MatchingWidget extends StatefulWidget {
   final List<Word> words;
@@ -12,6 +14,7 @@ class MatchingWidget extends StatefulWidget {
 }
 
 class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStateMixin {
+  final StudyProgressRepository _studyProgressRepository = getIt<StudyProgressRepository>();
   List<MatchCard> allCards = [];
   int? selectedIndex;
   List<int> matchedIndices = [];
@@ -178,7 +181,9 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
     }
   }
 
-  void _showResults(int completionTime) {
+  Future<void> _showResults(int completionTime) async {
+    await _saveStudyResult(completionTime);
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -216,6 +221,21 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
           onTap: _restartGame,
         ),
       ),
+    );
+  }
+
+  Future<void> _saveStudyResult(int completionTime) async {
+    if (widget.words.isEmpty) return;
+    final firstWord = widget.words.first;
+    final totalWords = allCards.length ~/ 2;
+    await _studyProgressRepository.saveStudyResult(
+      bookId: firstWord.bookId,
+      topicId: firstWord.topicId,
+      mode: 'matching',
+      score: totalWords,
+      total: totalWords,
+      percentage: 100,
+      durationSec: completionTime,
     );
   }
 

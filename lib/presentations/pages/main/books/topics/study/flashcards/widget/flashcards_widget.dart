@@ -5,6 +5,7 @@ import 'package:k_quiz/utils/extensions.dart';
 
 import '../../../../../../../../data/models/word.dart';
 import '../../../../../../../../data/repositories/word_repository.dart';
+import '../../../../../../../../data/repositories/study_progress_repository.dart';
 import '../../../../../../../../di/service_locator.dart';
 import '../../../../../../../ui/common/gradient_card.dart';
 import '../../../../../../../../services/tts_service.dart';
@@ -24,6 +25,7 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
   late PageController _pageController;
   late DateTime _startedAt;
   final WordRepository _wordRepository = getIt<WordRepository>();
+  final StudyProgressRepository _studyProgressRepository = getIt<StudyProgressRepository>();
   final Set<int> _savedWordIds = <int>{};
   int currentIndex = 0;
   bool isFlipped = false;
@@ -127,8 +129,10 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
     setState(() => _isSavingWord = false);
   }
 
-  void _showResults() {
+  Future<void> _showResults() async {
     final completionSeconds = DateTime.now().difference(_startedAt).inSeconds;
+    await _saveStudyResult(completionSeconds);
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -167,6 +171,20 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
           onTap: _restartFlashcards,
         ),
       ),
+    );
+  }
+
+  Future<void> _saveStudyResult(int completionSeconds) async {
+    if (widget.words.isEmpty) return;
+    final firstWord = widget.words.first;
+    await _studyProgressRepository.saveStudyResult(
+      bookId: firstWord.bookId,
+      topicId: firstWord.topicId,
+      mode: 'flashcard',
+      score: widget.words.length,
+      total: widget.words.length,
+      percentage: 100,
+      durationSec: completionSeconds,
     );
   }
 

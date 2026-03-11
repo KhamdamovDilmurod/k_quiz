@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:k_quiz/data/models/word.dart';
 import 'package:k_quiz/data/repositories/word_repository.dart';
+import 'package:k_quiz/data/repositories/study_progress_repository.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 
@@ -179,7 +180,9 @@ class TestQuizWidget extends StatefulWidget {
 
 class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStateMixin {
   final WordRepository _wordRepository = getIt<WordRepository>();
+  final StudyProgressRepository _studyProgressRepository = getIt<StudyProgressRepository>();
   final Set<int> _savedWordIds = <int>{};
+  final DateTime _startedAt = DateTime.now();
   int currentQuestion = 0;
   int score = 0;
   int? selectedAnswer;
@@ -306,8 +309,11 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
     }
   }
 
-  void _showResults() {
+  Future<void> _showResults() async {
     final percentage = (score / widget.words.length * 100);
+    final durationSec = DateTime.now().difference(_startedAt).inSeconds;
+    await _saveStudyResult(percentage, durationSec);
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -341,6 +347,20 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
           },
         ),
       ),
+    );
+  }
+
+  Future<void> _saveStudyResult(double percentage, int durationSec) async {
+    if (widget.words.isEmpty) return;
+    final firstWord = widget.words.first;
+    await _studyProgressRepository.saveStudyResult(
+      bookId: firstWord.bookId,
+      topicId: firstWord.topicId,
+      mode: 'test',
+      score: score,
+      total: widget.words.length,
+      percentage: percentage,
+      durationSec: durationSec,
     );
   }
 

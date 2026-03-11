@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import '../config/theme_controller.dart';
 import '../data/network/database_helper.dart';
 import '../data/repositories/firebase_auth_repository.dart';
+import '../data/repositories/study_progress_repository.dart';
 import '../data/repositories/word_repository.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/google_sheets_service.dart';
@@ -31,6 +32,9 @@ Future<void> setupDependencies() async {
   // Repositories
   getIt.registerLazySingleton<WordRepository>(
           () => WordRepository(getIt<Database>())
+  );
+  getIt.registerLazySingleton<StudyProgressRepository>(
+          () => StudyProgressRepository(getIt<Database>())
   );
 
   // Services

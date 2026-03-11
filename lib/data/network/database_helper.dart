@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -75,6 +75,24 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_word_book ON words(book_id)');
     await db.execute('CREATE INDEX idx_saved_word ON saved_words(word_id)');
     await db.execute('CREATE INDEX idx_saved_date ON saved_words(saved_at)');
+    await db.execute('''
+      CREATE TABLE study_results (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_id INTEGER NOT NULL,
+        topic_id INTEGER NOT NULL,
+        mode TEXT NOT NULL,
+        score INTEGER NOT NULL,
+        total INTEGER NOT NULL,
+        percentage REAL NOT NULL,
+        duration_sec INTEGER NOT NULL,
+        completed_at INTEGER NOT NULL,
+        FOREIGN KEY (book_id) REFERENCES books (id),
+        FOREIGN KEY (topic_id) REFERENCES topics (topic_id)
+      )
+    ''');
+    await db.execute('CREATE INDEX idx_study_results_topic ON study_results(topic_id)');
+    await db.execute('CREATE INDEX idx_study_results_mode ON study_results(mode)');
+    await db.execute('CREATE INDEX idx_study_results_completed_at ON study_results(completed_at)');
   }
 
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -90,6 +108,26 @@ class DatabaseHelper {
       ''');
       await db.execute('CREATE INDEX idx_saved_word ON saved_words(word_id)');
       await db.execute('CREATE INDEX idx_saved_date ON saved_words(saved_at)');
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE study_results (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          book_id INTEGER NOT NULL,
+          topic_id INTEGER NOT NULL,
+          mode TEXT NOT NULL,
+          score INTEGER NOT NULL,
+          total INTEGER NOT NULL,
+          percentage REAL NOT NULL,
+          duration_sec INTEGER NOT NULL,
+          completed_at INTEGER NOT NULL,
+          FOREIGN KEY (book_id) REFERENCES books (id),
+          FOREIGN KEY (topic_id) REFERENCES topics (topic_id)
+        )
+      ''');
+      await db.execute('CREATE INDEX idx_study_results_topic ON study_results(topic_id)');
+      await db.execute('CREATE INDEX idx_study_results_mode ON study_results(mode)');
+      await db.execute('CREATE INDEX idx_study_results_completed_at ON study_results(completed_at)');
     }
   }
 
