@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/data/bloc/base/base_state.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/ui/common/custom_appbar.dart';
 import 'package:k_quiz/presentations/ui/common/empty_state.dart';
-import 'package:k_quiz/utils/colors.dart';
 
 import 'saved_words_bloc.dart';
 
@@ -21,20 +21,21 @@ class SavedWordsPage extends StatelessWidget {
 }
 
 Widget _buildPage(BuildContext context) {
+  final extra = context.appColors;
   return Scaffold(
-    backgroundColor: AppColors.backgroundColor,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     appBar: CustomAppBar(
       title: 'Saqlanganlar',
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
+        icon: Icon(Icons.arrow_back_ios_new, color: extra.textPrimary),
         onPressed: () => Navigator.pop(context),
       ),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 18.0),
           child: IconButton(
-            icon: const Icon(Icons.videogame_asset_rounded, color: Color(0xFF1F2937)),
+            icon: Icon(Icons.videogame_asset_rounded, color: extra.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
         )
@@ -83,9 +84,9 @@ Widget _buildPage(BuildContext context) {
                       margin: const EdgeInsets.only(bottom: 12),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: extra.cardBackground,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                        border: Border.all(color: extra.cardBorder),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,18 +97,18 @@ Widget _buildPage(BuildContext context) {
                               children: [
                                 Text(
                                   koreanWord,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1F2937),
+                                    color: extra.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
                                   uzbekWord,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
-                                    color: Color(0xFF6B7280),
+                                    color: extra.textSecondary,
                                   ),
                                 ),
                                 if (topicName.isNotEmpty || bookName.isNotEmpty) ...[

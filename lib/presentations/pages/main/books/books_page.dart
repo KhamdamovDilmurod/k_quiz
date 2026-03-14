@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:k_quiz/presentations/pages/auth2/login_screen.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/topics_page.dart';
-import 'package:k_quiz/utils/colors.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
 
 import '../../../../data/bloc/base/base_state.dart';
@@ -11,7 +11,7 @@ import '../../../ui/common/animated_drawer.dart';
 import '../../../ui/common/custom_appbar.dart';
 import '../../../ui/common/empty_state.dart';
 import '../../../ui/widget/books_item_view.dart';
-import '../../auth2/auth_bloc.dart';
+import '../../auth/auth_bloc.dart';
 import 'books_bloc.dart';
 
 class BooksScreen extends StatelessWidget {
@@ -28,16 +28,17 @@ class BooksScreen extends StatelessWidget {
 
 Widget _buildPage(BuildContext context) {
   final user = getIt<PrefUtils>().getUserData();
+  final colorScheme = Theme.of(context).colorScheme;
   final appBarTitle = (user?.displayName?.trim().isNotEmpty ?? false)
       ? "Kitoblar - ${user!.displayName!.trim()}"
       : "Kitoblar ro'yxati";
 
   return Scaffold(
-    backgroundColor: AppColors.backgroundColor,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     drawer: AnimatedDrawer(onLogout: () => _showLogoutDialog(context),),
     appBar: CustomAppBar(
       title: appBarTitle,
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       showMenuButton: true,
     ),
     body: SafeArea(
@@ -49,7 +50,7 @@ Widget _buildPage(BuildContext context) {
 
           if (state is BooksLoadedState) {
             return RefreshIndicator(
-              color: const Color(0xFF9333EA),
+              color: colorScheme.primary,
               onRefresh: () async {
                 context.read<BooksBloc>().add(RefreshBooksEvent());
               },
@@ -86,6 +87,7 @@ Widget _buildPage(BuildContext context) {
 }
 
 void _showLogoutDialog(BuildContext context) {
+  final extra = context.appColors;
   showDialog(
     context: context,
     builder: (dialogContext) => AlertDialog(
@@ -108,7 +110,7 @@ void _showLogoutDialog(BuildContext context) {
             );
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
+            backgroundColor: extra.danger,
           ),
           child: Text('Ha, chiqish'),
         ),

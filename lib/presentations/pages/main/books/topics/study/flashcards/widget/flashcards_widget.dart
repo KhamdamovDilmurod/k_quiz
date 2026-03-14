@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 import 'package:k_quiz/utils/extensions.dart';
 
@@ -137,7 +138,7 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
       context: context,
       barrierDismissible: false,
       builder: (context) => StudyResultDialog(
-        accentColor: const Color(0xFF3B82F6),
+        accentColor: Theme.of(context).colorScheme.secondary,
         lottieAssetPath: 'assets/lotties/celeberate.json',
         title: 'Flashcard yakunlandi!',
         subtitle: '${widget.words.length} ta kartochkani ko\'rib chiqdingiz',
@@ -153,9 +154,9 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
         ],
         primaryAction: StudyResultAction(
           label: 'Yopish',
-          gradientColors: const [
-            Color(0xFF6B46C1),
-            Color(0xFF9333EA),
+          gradientColors: [
+            context.appColors.gradientStart,
+            context.appColors.gradientEnd,
           ],
           onTap: () {
             Navigator.pop(context);
@@ -164,9 +165,9 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
         ),
         secondaryAction: StudyResultAction(
           label: 'Qayta',
-          gradientColors: const [
-            Color(0xFF6B7280),
-            Color(0xFF4B5563),
+          gradientColors: [
+            context.appColors.textSecondary,
+            context.appColors.textSecondary.withValues(alpha: 0.72),
           ],
           onTap: _restartFlashcards,
         ),
@@ -200,6 +201,8 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       children: [
         const SizedBox(height: 20),
@@ -213,18 +216,18 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                 children: [
                   Text(
                     '${currentIndex + 1} / ${widget.words.length}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B7280),
+                      color: extra.textSecondary,
                     ),
                   ),
                   Text(
                     '${((currentIndex + 1) / widget.words.length * 100).toInt()}%',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B46C1),
+                      color: extra.gradientStart,
                     ),
                   ),
                 ],
@@ -234,8 +237,8 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
                   value: (currentIndex + 1) / widget.words.length,
-                  backgroundColor: const Color(0xFFE5E7EB),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
+                  backgroundColor: extra.cardBorder,
+                  valueColor: AlwaysStoppedAnimation<Color>(extra.gradientStart),
                   minHeight: 8,
                 ),
               ),
@@ -268,23 +271,23 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B82F6).withOpacity(0.1),
+              color: colorScheme.secondary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
-              children: const [
+              children: [
                 Icon(
                   Icons.swipe_rounded,
-                  color: Color(0xFF3B82F6),
+                  color: colorScheme.secondary,
                   size: 20,
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Kartochkani bosing yoki chap/o\'ngga suring',
                     style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF3B82F6),
+                      color: colorScheme.secondary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -307,8 +310,8 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                   isEnabled: currentIndex > 0,
                   onPressed: _previousCard,
                   gradientColors: [
-                    const Color(0xFF6B7280),
-                    const Color(0xFF4B5563),
+                    extra.textSecondary,
+                    extra.textSecondary.withValues(alpha: 0.72),
                   ],
                 ),
               ),
@@ -324,8 +327,8 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
                   isEnabled: true,
                   onPressed: _handleNextAction,
                   gradientColors: [
-                    const Color(0xFF6B46C1),
-                    const Color(0xFF9333EA),
+                    extra.gradientStart,
+                    extra.gradientEnd,
                   ],
                 ),
               ),
@@ -348,8 +351,8 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
         height: 34,
         decoration: BoxDecoration(
           color: isSaved
-              ? const Color(0xFFF59E0B).withOpacity(0.16)
-              : const Color(0xFFE5E7EB),
+              ? context.appColors.warning.withValues(alpha: 0.16)
+              : context.appColors.cardBorder,
           borderRadius: BorderRadius.circular(10),
         ),
         child: _isSavingWord
@@ -359,7 +362,7 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
               )
             : Icon(
                 isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                color: isSaved ? const Color(0xFFF59E0B) : const Color(0xFF6B7280),
+                color: isSaved ? context.appColors.warning : context.appColors.textSecondary,
                 size: 20,
               ),
       ),
@@ -380,8 +383,8 @@ class _FlashcardsWidgetState extends State<FlashcardsWidget> {
       gradientColors: isEnabled
           ? gradientColors
           : [
-        const Color(0xFFE5E7EB),
-        const Color(0xFFD1D5DB),
+        context.appColors.cardBorder,
+        context.appColors.cardBorder.withValues(alpha: 0.82),
       ],
       onTap: isEnabled ? onPressed : null,
       enableAnimation: isEnabled,
@@ -592,7 +595,10 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
           child: angle < pi / 2
               ? _buildCardSide(
             widget.frontText,
-            [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
+            [
+              Theme.of(context).colorScheme.secondary,
+              Theme.of(context).colorScheme.secondary.withValues(alpha: 0.82),
+            ],
             Icons.translate_rounded,
             showVoiceButton: true,
           )
@@ -601,7 +607,10 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
             alignment: Alignment.center,
             child: _buildCardSide(
               widget.backText,
-              [const Color(0xFF10B981), const Color(0xFF059669)],
+              [
+                context.appColors.success,
+                context.appColors.success.withValues(alpha: 0.82),
+              ],
               Icons.check_circle_outline_rounded,
               showVoiceButton: false,
             ),
@@ -629,7 +638,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: gradientColors[1].withOpacity(0.4),
+            color: gradientColors[1].withValues(alpha: 0.4),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -644,10 +653,10 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
             child: Container(
               width: 150,
               height: 150,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
             ),
           ),
           Positioned(
@@ -656,10 +665,10 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
             child: Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.1),
+                ),
             ),
           ),
           // Voice button (top right)
@@ -672,10 +681,10 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
+                      color: Colors.white.withValues(alpha: 0.3),
                       width: 2,
                     ),
                   ),
@@ -703,7 +712,7 @@ class _FlipCardState extends State<FlipCard> with SingleTickerProviderStateMixin
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(

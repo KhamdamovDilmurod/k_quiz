@@ -3,9 +3,9 @@ import '../../../../../data/network/database_helper.dart';
 import '../../../../../data/repositories/word_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../../../../../config/theme_controller.dart';
-import '../../../../../di/service_locator.dart';
-import '../../../../../utils/colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../config/app_theme_colors.dart';
+import '../../../../../config/theme_cubit.dart';
 
 import '../../../../../services/google_sheets_service.dart';
 
@@ -16,7 +16,7 @@ class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  _SettingsScreenState createState() => _SettingsScreenState();
+  State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
@@ -78,6 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final titleStyle = Theme.of(context).textTheme;
+    final extra = context.appColors;
 
     return Scaffold(
       body: Container(
@@ -86,8 +87,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.backgroundColor,
-              const Color(0xFFEAF2FF),
+              Theme.of(context).scaffoldBackgroundColor,
+              extra.mutedSurface,
             ],
           ),
         ),
@@ -100,14 +101,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                      icon: Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: extra.textPrimary,
+                      ),
                     ),
                     Expanded(
                       child: Text(
                         'Sozlamalar',
                         style: titleStyle.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1F2937),
+                          color: extra.textPrimary,
                         ),
                       ),
                     ),
@@ -124,12 +128,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).colorScheme.secondary,
+                            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.82),
+                          ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF1D4ED8).withOpacity(0.25),
+                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.25),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -152,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ? 'So\'nggi sync: hali bajarilmagan'
                                 : 'So\'nggi sync: ${_lastSyncedAt!.hour.toString().padLeft(2, '0')}:${_lastSyncedAt!.minute.toString().padLeft(2, '0')}',
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               fontSize: 13,
                             ),
                           ),
@@ -196,12 +203,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         duration: const Duration(milliseconds: 250),
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: extra.cardBackground,
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: const Color(0xFFE5E7EB)),
+                          border: Border.all(color: extra.cardBorder),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -213,7 +220,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFDBEAFE),
+                                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.14),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: _isLoading
@@ -227,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                             ),
                             const SizedBox(width: 12),
-                            const Expanded(
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -236,24 +243,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15,
-                                      color: Color(0xFF111827),
+                                      color: extra.textPrimary,
                                     ),
                                   ),
                                   SizedBox(height: 2),
                                   Text(
                                     'Baza ichidagi kitob/topic/sozlarni qayta yuklaydi',
                                     style: TextStyle(
-                                      color: Color(0xFF6B7280),
+                                      color: extra.textSecondary,
                                       fontSize: 12,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.arrow_forward_ios_rounded,
                               size: 16,
-                              color: Color(0xFF9CA3AF),
+                              color: extra.textSecondary.withValues(alpha: 0.7),
                             ),
                           ],
                         ),
@@ -278,12 +285,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.appColors.cardBackground,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: context.appColors.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -295,7 +302,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color),
@@ -307,18 +314,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF6B7280),
+                    color: context.appColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '$value',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF111827),
+                    color: context.appColors.textPrimary,
                   ),
                 ),
               ],
@@ -331,23 +338,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildThemeModeCard(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final extra = context.appColors;
 
-    return AnimatedBuilder(
-      animation: getIt<ThemeController>(),
-      builder: (context, _) {
-        final controller = getIt<ThemeController>();
-        final isSystem = controller.themeMode == ThemeMode.system;
-        final isDark = controller.themeMode == ThemeMode.dark;
+    return BlocBuilder<ThemeCubit, ThemeState>(
+      builder: (context, state) {
+        final isSystem = state.themeMode == ThemeMode.system;
+        final isDark = state.themeMode == ThemeMode.dark;
 
         return Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFFE5E7EB)),
+            border: Border.all(color: extra.cardBorder),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -369,7 +375,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'Telefon sozlamasiga moslashadi',
                 value: isSystem,
                 onChanged: (value) {
-                  controller.setThemeMode(
+                  context.read<ThemeCubit>().changeTheme(
                     value ? ThemeMode.system : ThemeMode.light,
                   );
                 },
@@ -381,7 +387,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'Qorong\'i rejimni yoqish/o\'chirish',
                 value: isDark,
                 onChanged: (value) {
-                  controller.setThemeMode(
+                  context.read<ThemeCubit>().changeTheme(
                     value ? ThemeMode.dark : ThemeMode.light,
                   );
                 },
@@ -400,16 +406,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
+    final extra = context.appColors;
     return Row(
       children: [
         Container(
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: const Color(0xFFDBEAFE),
+            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: const Color(0xFF1D4ED8)),
+          child: Icon(icon, color: Theme.of(context).colorScheme.secondary),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -426,8 +433,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
-                  color: Color(0xFF6B7280),
+                style: TextStyle(
+                  color: extra.textSecondary,
                   fontSize: 12,
                 ),
               ),
@@ -437,7 +444,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         CupertinoSwitch(
           value: value,
           onChanged: onChanged,
-          activeTrackColor: const Color(0xFF16A34A),
+          activeTrackColor: extra.success,
         ),
       ],
     );

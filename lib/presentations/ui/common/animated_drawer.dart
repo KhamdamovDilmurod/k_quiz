@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/data/models/user_model.dart';
 import 'package:k_quiz/di/service_locator.dart';
+import 'package:k_quiz/presentations/pages/main/about/about_page.dart';
 import 'package:k_quiz/presentations/pages/main/saved/saved_words_page.dart';
 import 'package:k_quiz/presentations/pages/main/statistics/statistics_page.dart';
-import 'package:k_quiz/utils/colors.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
 
 import '../../pages/main/books/topics/screens.dart';
@@ -41,11 +42,14 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
       selectedItem = 'Sevimlilar';
     } else if (route.contains('statistics')) {
       selectedItem = 'Statistika';
+    } else if (route.contains('about')) {
+      selectedItem = 'Dastur haqida';
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     return Drawer(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -53,8 +57,8 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.backgroundColor,
-              AppColors.backgroundColor,
+              Theme.of(context).scaffoldBackgroundColor,
+              extra.mutedSurface,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -78,10 +82,11 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       ],
                       isSelected: selectedItem == 'Bosh sahifa',
                       onTap: () {
+                        final navigator = Navigator.of(context);
                         setState(() => selectedItem = 'Bosh sahifa');
-                        // Navigator.pushNamed(context, '/home');
                         Future.delayed(const Duration(milliseconds: 300), () {
-                          Navigator.pop(context);
+                          if (!mounted) return;
+                          navigator.pop();
                         });
                       },
                     ),
@@ -95,9 +100,11 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       ],
                       isSelected: selectedItem == 'Kitoblar',
                       onTap: () {
+                        final navigator = Navigator.of(context);
                         setState(() => selectedItem = 'Kitoblar');
                         Future.delayed(const Duration(milliseconds: 300), () {
-                          Navigator.pop(context);
+                          if (!mounted) return;
+                          navigator.pop();
                         });
                       },
                     ),
@@ -111,11 +118,12 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       ],
                       isSelected: selectedItem == 'Sevimlilar',
                       onTap: () {
+                        final navigator = Navigator.of(context);
                         setState(() => selectedItem = 'Sevimlilar');
-                        Navigator.pop(context);
+                        navigator.pop();
                         Future.delayed(const Duration(milliseconds: 250), () {
                           if (!mounted) return;
-                          Navigator.of(context).push(
+                          navigator.push(
                             MaterialPageRoute(
                               builder: (_) => const SavedWordsPage(),
                             ),
@@ -133,11 +141,12 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       ],
                       isSelected: selectedItem == 'Statistika',
                       onTap: () {
+                        final navigator = Navigator.of(context);
                         setState(() => selectedItem = 'Statistika');
-                        Navigator.pop(context);
+                        navigator.pop();
                         Future.delayed(const Duration(milliseconds: 250), () {
                           if (!mounted) return;
-                          Navigator.of(context).push(
+                          navigator.push(
                             MaterialPageRoute(
                               builder: (_) => const StatisticsPage(),
                             ),
@@ -155,10 +164,11 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       ],
                       isSelected: selectedItem == 'Sozlamalar',
                       onTap: () {
+                        final navigator = Navigator.of(context);
                         setState(() => selectedItem = 'Sozlamalar');
                         Future.delayed(const Duration(milliseconds: 300), () {
-                          Navigator.push(
-                            context,
+                          if (!mounted) return;
+                          navigator.push(
                             MaterialPageRoute(
                               builder: (_) => SettingsScreen(),
                             ),
@@ -184,7 +194,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       },
                     ),
                     const SizedBox(height: 32),
-                    const Divider(color: Colors.black26, thickness: 1),
+                    Divider(color: Theme.of(context).dividerColor, thickness: 1),
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.info_rounded,
@@ -195,9 +205,16 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       ],
                       isSelected: selectedItem == 'Dastur haqida',
                       onTap: () {
+                        final navigator = Navigator.of(context);
                         setState(() => selectedItem = 'Dastur haqida');
                         Future.delayed(const Duration(milliseconds: 300), () {
-                          Navigator.pop(context);
+                          if (!mounted) return;
+                          navigator.pop();
+                          navigator.push(
+                            MaterialPageRoute(
+                              builder: (_) => const AboutPage(),
+                            ),
+                          );
                         });
                       },
                     ),
@@ -213,6 +230,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
   }
 
   Widget _buildHeader() {
+    final extra = context.appColors;
     final user = _user;
     final userName = (user?.displayName?.trim().isNotEmpty ?? false)
         ? user!.displayName!.trim()
@@ -230,16 +248,13 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  Color(0xFF6B46C1),
-                  Color(0xFF9333EA),
-                ],
+              gradient: LinearGradient(
+                colors: [extra.gradientStart, extra.gradientEnd],
               ),
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF9333EA).withOpacity(0.4),
+                  color: extra.gradientEnd.withValues(alpha: 0.4),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),
@@ -267,7 +282,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           Text(
             userName,
             style: TextStyle(
-              color: Colors.black,
+              color: extra.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -276,7 +291,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           Text(
             userEmail,
             style: TextStyle(
-              color: Colors.black.withOpacity(0.7),
+              color: extra.textSecondary,
               fontSize: 14,
             ),
           ),
@@ -292,13 +307,14 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final extra = context.appColors;
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        splashColor: gradientColors[0].withOpacity(0.3),
-        highlightColor: gradientColors[0].withOpacity(0.1),
+        splashColor: gradientColors[0].withValues(alpha: 0.3),
+        highlightColor: gradientColors[0].withValues(alpha: 0.1),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
@@ -307,23 +323,23 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
             gradient: isSelected
                 ? LinearGradient(
               colors: [
-                gradientColors[0].withOpacity(0.3),
-                gradientColors[1].withOpacity(0.3),
+                gradientColors[0].withValues(alpha: 0.3),
+                gradientColors[1].withValues(alpha: 0.3),
               ],
             )
                 : null,
-            color: isSelected ? null : Colors.white.withOpacity(0.05),
+            color: isSelected ? null : extra.cardBackground.withValues(alpha: 0.35),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isSelected
-                  ? gradientColors[0].withOpacity(0.5)
-                  : Colors.white.withOpacity(0.1),
+                  ? gradientColors[0].withValues(alpha: 0.5)
+                  : extra.cardBorder.withValues(alpha: 0.5),
               width: isSelected ? 2 : 1,
             ),
             boxShadow: isSelected
                 ? [
               BoxShadow(
-                color: gradientColors[0].withOpacity(0.3),
+                color: gradientColors[0].withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -342,7 +358,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                   boxShadow: isSelected
                       ? [
                     BoxShadow(
-                      color: gradientColors[1].withOpacity(0.4),
+                      color: gradientColors[1].withValues(alpha: 0.4),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -360,7 +376,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 300),
                   style: TextStyle(
-                    color: isSelected ? Colors.white: Colors.black,
+                    color: isSelected ? Colors.white : extra.textPrimary,
                     fontSize: isSelected ? 17 : 16,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                   ),
@@ -372,7 +388,8 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                 width: isSelected ? 24 : 0,
                 child: Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: Colors.white.withOpacity(isSelected ? 0.8 : 0.5),
+                  color: (isSelected ? Colors.white : extra.textSecondary)
+                      .withValues(alpha: isSelected ? 0.8 : 0.5),
                   size: 16,
                 ),
               ),
@@ -384,6 +401,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
   }
 
   Widget _buildFooter() {
+    final extra = context.appColors;
     return Container(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -391,7 +409,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           Text(
             'K-Quiz v1.0.0',
             style: TextStyle(
-              color: Colors.black.withOpacity(0.7),
+              color: extra.textSecondary,
               fontSize: 12,
             ),
           ),
@@ -399,7 +417,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           Text(
             '© 2024 Barcha huquqlar himoyalangan',
             style: TextStyle(
-              color: Colors.black.withOpacity(0.5),
+              color: extra.textSecondary.withValues(alpha: 0.72),
               fontSize: 10,
             ),
           ),

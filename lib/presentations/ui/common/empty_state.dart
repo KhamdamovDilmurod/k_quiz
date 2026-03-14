@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   final IconData icon;
@@ -22,9 +23,10 @@ class EmptyStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     final colors = gradientColors ?? [
-      const Color(0xFF6B46C1).withOpacity(0.2),
-      const Color(0xFF9333EA).withOpacity(0.2),
+      extra.gradientStart.withValues(alpha: 0.2),
+      extra.gradientEnd.withValues(alpha: 0.2),
     ];
 
     return Center(
@@ -47,26 +49,26 @@ class EmptyStateWidget extends StatelessWidget {
               child: Icon(
                 icon,
                 size: iconSize,
-                color: const Color(0xFF9333EA),
+                color: extra.gradientEnd,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
+                color: extra.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFF6B7280),
+                color: extra.textSecondary,
               ),
             ),
             if (actionButton != null) ...[

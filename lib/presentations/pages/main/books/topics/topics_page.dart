@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/learning_method_page.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/topics_bloc.dart';
 import 'package:k_quiz/presentations/ui/widget/topics_item_view.dart';
 
 import '../../../../../data/bloc/base/base_state.dart';
 import '../../../../../di/service_locator.dart';
-import '../../../../../utils/colors.dart';
 import '../../../../ui/common/custom_appbar.dart';
 import '../../../../ui/common/empty_state.dart';
 
@@ -24,12 +24,15 @@ class TopicsPage extends StatelessWidget {
 
   Widget _buildPage(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: "Mavzular",
-        backgroundColor: AppColors.backgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: context.appColors.textPrimary,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -73,50 +76,6 @@ class TopicsPage extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
-  }
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF6B46C1).withOpacity(0.2),
-                  Color(0xFF9333EA).withOpacity(0.2),
-                ],
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.menu_book_rounded,
-              size: 60,
-              color: Color(0xFF9333EA),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Kitoblar topilmadi',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1F2937),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Hozircha kitoblar yo\'q',
-            style: TextStyle(
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-            ),
-          ),
-        ],
       ),
     );
   }

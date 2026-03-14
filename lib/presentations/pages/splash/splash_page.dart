@@ -1,7 +1,7 @@
 // splash/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:k_quiz/presentations/pages/auth2/login_screen.dart';
+import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
 import 'package:k_quiz/presentations/pages/main/books/books_page.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/services/google_sheets_service.dart';

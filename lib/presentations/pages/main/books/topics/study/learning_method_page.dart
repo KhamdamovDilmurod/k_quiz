@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/matching/matching_page.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/test/test_page.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_page.dart';
-import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_widgets.dart';
-import '../../../../../../utils/colors.dart';
 import '../../../../../ui/common/custom_appbar.dart';
 import '../../../../../ui/common/learning_method_card.dart';
 import 'flashcards/flashcards_page.dart';
@@ -18,13 +17,14 @@ class LearningMethodScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: CustomAppBar(
         title: "Interaktiv uslullar",
-        backgroundColor:AppColors.backgroundColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
+          icon: Icon(Icons.arrow_back_ios_new, color: extra.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -35,12 +35,12 @@ class LearningMethodScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 "Qaysi usulda o'rganmoqchisiz?",
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
+                  color: extra.textPrimary,
                 ),
               ),
               const SizedBox(height: 32),

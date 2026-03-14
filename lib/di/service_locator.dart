@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../config/theme_controller.dart';
 import '../data/network/database_helper.dart';
 import '../data/repositories/firebase_auth_repository.dart';
 import '../data/repositories/study_progress_repository.dart';
@@ -24,10 +23,6 @@ Future<void> setupDependencies() async {
   await prefUtils.init(); // Initializatsiya qilish kerak
   getIt.registerSingleton<PrefUtils>(prefUtils);
   /// ishlatilinishi   ->    getIt<PrefUtils>().setToken("");
-
-  final themeController = ThemeController(prefUtils);
-  await themeController.load();
-  getIt.registerSingleton<ThemeController>(themeController);
 
   // Repositories
   getIt.registerLazySingleton<WordRepository>(

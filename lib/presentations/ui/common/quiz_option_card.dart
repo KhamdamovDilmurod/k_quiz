@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 
 enum OptionState {
   normal,
@@ -23,6 +24,7 @@ class QuizOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     final gradientColors = _getGradientColors();
     final isSelected = state != OptionState.normal;
 
@@ -37,10 +39,10 @@ class QuizOptionCard extends StatelessWidget {
             gradient: gradientColors != null
                 ? LinearGradient(colors: gradientColors)
                 : null,
-            color: gradientColors == null ? Colors.white : null,
+            color: gradientColors == null ? extra.cardBackground : null,
             borderRadius: BorderRadius.circular(16),
             border: gradientColors == null
-                ? Border.all(color: const Color(0xFFE5E7EB), width: 2)
+                ? Border.all(color: extra.cardBorder, width: 2)
                 : null,
             boxShadow: [
               BoxShadow(
@@ -60,7 +62,7 @@ class QuizOptionCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: gradientColors != null
                       ? Colors.white.withOpacity(0.3)
-                      : const Color(0xFFF3F4F6),
+                      : extra.mutedSurface,
                   shape: BoxShape.circle,
                 ),
                 child: Center(
@@ -71,7 +73,7 @@ class QuizOptionCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: gradientColors != null
                           ? Colors.white
-                          : const Color(0xFF6B7280),
+                          : extra.textSecondary,
                     ),
                   ),
                 ),
@@ -84,7 +86,7 @@ class QuizOptionCard extends StatelessWidget {
                     fontSize: 18,
                     color: gradientColors != null
                         ? Colors.white
-                        : const Color(0xFF1F2937),
+                        : extra.textPrimary,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                   ),
                 ),

@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 class AppColors {
-  static const Color backgroundColor = Color(0xFFF5F5F7);
   static const Color lightGrey = Color(0xFFe5e5e5);
   static const List<Color> randomColors = [
     Color(0xFFF8A44C),

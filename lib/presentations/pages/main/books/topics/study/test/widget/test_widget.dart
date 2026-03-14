@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/data/models/word.dart';
 import 'package:k_quiz/data/repositories/word_repository.dart';
 import 'package:k_quiz/data/repositories/study_progress_repository.dart';
@@ -30,17 +31,18 @@ class _TestWidgetState extends State<TestWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     if (showTimerDialog) {
       return Center(
         child: Container(
           margin: const EdgeInsets.all(20),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: extra.cardBackground,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -54,25 +56,25 @@ class _TestWidgetState extends State<TestWidget> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      const Color(0xFF10B981).withOpacity(0.2),
-                      const Color(0xFF059669).withOpacity(0.2),
+                      extra.success.withValues(alpha: 0.2),
+                      extra.success.withValues(alpha: 0.12),
                     ],
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.timer_rounded,
                   size: 48,
-                  color: Color(0xFF10B981),
+                  color: extra.success,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Har bir savol uchun vaqt chegarasi',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1F2937),
+                  color: extra.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -86,9 +88,9 @@ class _TestWidgetState extends State<TestWidget> {
                 margin: EdgeInsets.zero,
                 padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
                 borderRadius: 16,
-                gradientColors: const [
-                  Color(0xFF10B981),
-                  Color(0xFF059669),
+                gradientColors: [
+                  extra.success,
+                  extra.success.withValues(alpha: 0.82),
                 ],
                 onTap: _startTest,
                 child: Row(
@@ -119,6 +121,7 @@ class _TestWidgetState extends State<TestWidget> {
 
   Widget _buildTimeOption(String label, int? seconds) {
     final isSelected = timeLimit == seconds;
+    final extra = context.appColors;
     return GestureDetector(
       onTap: () => setState(() => timeLimit = seconds),
       child: Container(
@@ -126,11 +129,11 @@ class _TestWidgetState extends State<TestWidget> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF10B981).withOpacity(0.1)
-              : const Color(0xFFF9FAFB),
+              ? extra.success.withValues(alpha: 0.1)
+              : extra.mutedSurface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF10B981) : const Color(0xFFE5E7EB),
+            color: isSelected ? extra.success : extra.cardBorder,
             width: 2,
           ),
         ),
@@ -142,10 +145,10 @@ class _TestWidgetState extends State<TestWidget> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? const Color(0xFF10B981) : const Color(0xFFD1D5DB),
+                  color: isSelected ? extra.success : extra.cardBorder,
                   width: 2,
                 ),
-                color: isSelected ? const Color(0xFF10B981) : Colors.transparent,
+                color: isSelected ? extra.success : Colors.transparent,
               ),
               child: isSelected
                   ? const Icon(Icons.check, size: 16, color: Colors.white)
@@ -157,7 +160,7 @@ class _TestWidgetState extends State<TestWidget> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? const Color(0xFF10B981) : const Color(0xFF6B7280),
+                color: isSelected ? extra.success : extra.textSecondary,
               ),
             ),
           ],
@@ -319,8 +322,8 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
       barrierDismissible: false,
       builder: (context) => StudyResultDialog(
         accentColor: percentage >= 70
-            ? const Color(0xFF10B981)
-            : const Color(0xFFF59E0B),
+            ? context.appColors.success
+            : context.appColors.warning,
         lottieAssetPath: percentage >= 70
             ? 'assets/lotties/satisification.json'
             : 'assets/lotties/unstatification.json',
@@ -337,9 +340,9 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
         ],
         primaryAction: StudyResultAction(
           label: 'Yopish',
-          gradientColors: const [
-            Color(0xFF6B46C1),
-            Color(0xFF9333EA),
+          gradientColors: [
+            context.appColors.gradientStart,
+            context.appColors.gradientEnd,
           ],
           onTap: () {
             Navigator.pop(context);
@@ -372,6 +375,7 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     final currentWord = widget.words[currentQuestion];
     final correctAnswerIndex = options.indexOf(currentWord.uzbekWord ?? '');
 
@@ -385,17 +389,20 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
             children: [
               Text(
                 'Savol ${currentQuestion + 1}/${widget.words.length}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
+                  color: extra.textPrimary,
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF10B981), Color(0xFF059669)],
+                  gradient: LinearGradient(
+                    colors: [
+                      extra.success,
+                      extra.success.withValues(alpha: 0.82),
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -422,11 +429,11 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
                   borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
                     value: 1 - _timerController!.value,
-                    backgroundColor: const Color(0xFFE5E7EB),
+                    backgroundColor: extra.cardBorder,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       _timerController!.value > 0.7
-                          ? const Color(0xFFEF4444)
-                          : const Color(0xFF10B981),
+                          ? extra.danger
+                          : extra.success,
                     ),
                   ),
                 ),
@@ -439,15 +446,15 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
           margin: const EdgeInsets.symmetric(horizontal: 20),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF6B46C1), Color(0xFF9333EA)],
+            gradient: LinearGradient(
+              colors: [extra.gradientStart, extra.gradientEnd],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF9333EA).withOpacity(0.3),
+                color: extra.gradientEnd.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               ),
@@ -467,7 +474,7 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -493,13 +500,13 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
           ),
         ),
         const SizedBox(height: 16),
-        const Padding(
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Text(
             'Tarjimasini tanlang:',
             style: TextStyle(
               fontSize: 18,
-              color: Color(0xFF6B7280),
+              color: extra.textSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -549,8 +556,8 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
         height: 42,
         decoration: BoxDecoration(
           color: isSaved
-              ? const Color(0xFFF59E0B).withOpacity(0.16)
-              : const Color(0xFFE5E7EB),
+              ? context.appColors.warning.withValues(alpha: 0.16)
+              : context.appColors.cardBorder,
           borderRadius: BorderRadius.circular(12),
         ),
         child: _isSavingWord
@@ -560,7 +567,7 @@ class _TestQuizWidgetState extends State<TestQuizWidget> with TickerProviderStat
               )
             : Icon(
                 isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-                color: isSaved ? const Color(0xFFF59E0B) : const Color(0xFF6B7280),
+                color: isSaved ? context.appColors.warning : context.appColors.textSecondary,
               ),
       ),
     );

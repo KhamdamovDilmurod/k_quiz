@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/services/firebase_auth_service.dart';
-import 'package:k_quiz/presentations/pages/auth2/registr_screen.dart';
+import 'package:k_quiz/presentations/pages/auth/registr_screen.dart';
 import 'auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {

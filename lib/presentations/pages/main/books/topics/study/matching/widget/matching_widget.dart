@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/data/models/word.dart';
 import 'package:k_quiz/data/repositories/study_progress_repository.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
@@ -187,7 +188,7 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => StudyResultDialog(accentColor: const Color(0xFF10B981),
+      builder: (context) => StudyResultDialog(accentColor: context.appColors.success,
         lottieAssetPath: 'assets/lotties/celeberate.json',
         title: _getPerformanceText(completionTime),
         subtitle: '${allCards.length ~/ 2} ta so\'zni to\'g\'ri moslashtirdingiz',
@@ -203,9 +204,9 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
         ],
         primaryAction: StudyResultAction(
           label: 'Yopish',
-          gradientColors: const [
-            Color(0xFF6B46C1),
-            Color(0xFF9333EA),
+          gradientColors: [
+            context.appColors.gradientStart,
+            context.appColors.gradientEnd,
           ],
           onTap: () {
             Navigator.pop(context);
@@ -214,9 +215,9 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
         ),
         secondaryAction: StudyResultAction(
           label: 'Qayta',
-          gradientColors: const [
-            Color(0xFF6B7280),
-            Color(0xFF4B5563),
+          gradientColors: [
+            context.appColors.textSecondary,
+            context.appColors.textSecondary.withValues(alpha: 0.72),
           ],
           onTap: _restartGame,
         ),
@@ -278,6 +279,7 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final safeAreaTop = MediaQuery.of(context).padding.top;
@@ -329,7 +331,7 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                 style: TextStyle(
                   fontSize: screenWidth * 0.04,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF6B7280),
+                  color: extra.textSecondary,
                 ),
               ),
               Row(
@@ -341,8 +343,8 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                       vertical: screenHeight * 0.01,
                     ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6B46C1), Color(0xFF9333EA)],
+                      gradient: LinearGradient(
+                        colors: [extra.gradientStart, extra.gradientEnd],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -373,8 +375,11 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                       vertical: screenHeight * 0.01,
                     ),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF10B981), Color(0xFF059669)],
+                      gradient: LinearGradient(
+                        colors: [
+                          extra.success,
+                          extra.success.withValues(alpha: 0.82),
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -449,31 +454,31 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                         gradient: isSelected
                             ? LinearGradient(
                           colors: isWrong
-                              ? [const Color(0xFFEF4444), const Color(0xFFDC2626)]
-                              : [const Color(0xFF6B46C1), const Color(0xFF9333EA)],
+                              ? [extra.danger, extra.danger.withValues(alpha: 0.82)]
+                              : [extra.gradientStart, extra.gradientEnd],
                         )
                             : null,
-                        color: isSelected ? null : Colors.white,
+                        color: isSelected ? null : extra.cardBackground,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isSelected
                               ? Colors.transparent
                               : isMatched
-                              ? const Color(0xFF10B981)
-                              : const Color(0xFFE5E7EB),
+                              ? extra.success
+                              : extra.cardBorder,
                           width: 2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
                           if (isSelected)
                             BoxShadow(
                               color: isWrong
-                                  ? const Color(0xFFEF4444).withOpacity(0.3)
-                                  : const Color(0xFF9333EA).withOpacity(0.3),
+                                  ? extra.danger.withValues(alpha: 0.3)
+                                  : extra.gradientEnd.withValues(alpha: 0.3),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -487,7 +492,7 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                             fontWeight: FontWeight.w600,
                             color: isSelected
                                 ? Colors.white
-                                : const Color(0xFF1F2937),
+                                : extra.textPrimary,
                           ),
                           textAlign: TextAlign.center,
                           maxLines: 3,

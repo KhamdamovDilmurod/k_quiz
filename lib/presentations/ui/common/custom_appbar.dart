@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -30,13 +31,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: elevation,
-      backgroundColor: backgroundColor ?? const Color(0xFFF5F5F7),
+      backgroundColor: backgroundColor ?? Theme.of(context).scaffoldBackgroundColor,
       leading: leading ?? (showMenuButton ? _buildMenuButton(context) : null),
       actions: actions,
       title: Text(
         title,
         style: TextStyle(
-          color: titleColor ?? const Color(0xFF1F2937),
+          color: titleColor ?? context.appColors.textPrimary,
           fontSize: titleFontSize ?? 28,
           fontWeight: titleFontWeight ?? FontWeight.bold,
         ),
@@ -50,7 +51,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             gradient: LinearGradient(
               colors: [
                 Colors.transparent,
-                Colors.grey.withOpacity(0.6),
+                Theme.of(context).dividerColor.withValues(alpha: 0.7),
                 Colors.transparent,
               ],
             ),
@@ -62,6 +63,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildMenuButton(BuildContext context) {
+    final extra = context.appColors;
     return Padding(
       padding: const EdgeInsets.only(left: 8),
       child: IconButton(
@@ -69,16 +71,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [
-                Color(0xFF6B46C1),
-                Color(0xFF9333EA),
-              ],
+            gradient: LinearGradient(
+              colors: [extra.gradientStart, extra.gradientEnd],
             ),
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF9333EA).withOpacity(0.1),
+                color: extra.gradientEnd.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),

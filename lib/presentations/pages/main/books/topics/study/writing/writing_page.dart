@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_widgets.dart';
 
 import '../../../../../../../data/bloc/base/base_state.dart';
 import '../../../../../../../di/service_locator.dart';
-import '../../../../../../../utils/colors.dart';
 import '../../../../../../ui/common/custom_appbar.dart';
 import '../../../../../../ui/common/empty_state.dart';
 import '../flashcards/flashcards_bloc.dart';
@@ -25,13 +25,14 @@ class WritingPage extends StatelessWidget {
 }
 
 Widget _buildPage(BuildContext context) {
+  final extra = context.appColors;
   return Scaffold(
-    backgroundColor: const Color(0xFFF5F5F7),
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     appBar: CustomAppBar(
       title: "Yozish",
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
+        icon: Icon(Icons.arrow_back_ios_new, color: extra.textPrimary),
         onPressed: () => Navigator.pop(context),
       ),
     ),

@@ -4,7 +4,6 @@ import 'package:k_quiz/presentations/pages/main/books/topics/study/matching/widg
 
 import '../../../../../../../data/bloc/base/base_state.dart';
 import '../../../../../../../di/service_locator.dart';
-import '../../../../../../../utils/colors.dart';
 import '../../../../../../ui/common/custom_appbar.dart';
 import '../../../../../../ui/common/empty_state.dart';
 import '../flashcards/flashcards_bloc.dart';
@@ -28,7 +27,7 @@ Widget _buildPage(BuildContext context) {
     backgroundColor: const Color(0xFFF5F5F7),
     appBar: CustomAppBar(
       title: "Matching",
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
         onPressed: () => Navigator.pop(context),

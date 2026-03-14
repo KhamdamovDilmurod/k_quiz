@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 import 'package:k_quiz/data/bloc/base/base_state.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/ui/common/custom_appbar.dart';
 import 'package:k_quiz/presentations/ui/common/empty_state.dart';
-import 'package:k_quiz/utils/colors.dart';
 
 import 'statistics_bloc.dart';
 
@@ -21,13 +21,14 @@ class StatisticsPage extends StatelessWidget {
 }
 
 Widget _buildPage(BuildContext context) {
+  final extra = context.appColors;
   return Scaffold(
-    backgroundColor: AppColors.backgroundColor,
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     appBar: CustomAppBar(
       title: 'Statistika',
-      backgroundColor: AppColors.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
+        icon: Icon(Icons.arrow_back_ios_new, color: extra.textPrimary),
         onPressed: () => Navigator.pop(context),
       ),
     ),
@@ -65,31 +66,31 @@ Widget _buildPage(BuildContext context) {
                 child: ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
-                    _buildSummarySection(state.summary),
+                    _buildSummarySection(context, state.summary),
                     const SizedBox(height: 18),
                     if (state.modeStats.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         'Rejimlar bo\'yicha',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
-                          color: Color(0xFF111827),
+                          color: extra.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 12),
-                      ...state.modeStats.map(_buildModeCard),
+                      ...state.modeStats.map((item) => _buildModeCard(context, item)),
                       const SizedBox(height: 18),
                     ],
-                    const Text(
+                    Text(
                       'Oxirgi natijalar',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF111827),
+                        color: extra.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 12),
-                    ...state.recentResults.map(_buildRecentResultCard),
+                    ...state.recentResults.map((item) => _buildRecentResultCard(context, item)),
                   ],
                 ),
               );
@@ -103,7 +104,8 @@ Widget _buildPage(BuildContext context) {
   );
 }
 
-Widget _buildSummarySection(Map<String, dynamic> summary) {
+Widget _buildSummarySection(BuildContext context, Map<String, dynamic> summary) {
+  final extra = context.appColors;
   final totalSessions = (summary['total_sessions'] ?? 0) as int;
   final avgPercentage = (summary['avg_percentage'] ?? 0.0) as double;
   final bestPercentage = (summary['best_percentage'] ?? 0.0) as double;
@@ -112,12 +114,12 @@ Widget _buildSummarySection(Map<String, dynamic> summary) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text(
+      Text(
         'Umumiy progress',
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF111827),
+          color: extra.textPrimary,
         ),
       ),
       const SizedBox(height: 12),
@@ -200,7 +202,8 @@ Widget _buildSummaryCard({
   );
 }
 
-Widget _buildModeCard(Map<String, dynamic> item) {
+Widget _buildModeCard(BuildContext context, Map<String, dynamic> item) {
+  final extra = context.appColors;
   final mode = (item['mode'] ?? '').toString();
   final sessionsCount = (item['sessions_count'] ?? 0) as int;
   final avgPercentage = (item['avg_percentage'] ?? 0.0) as double;
@@ -210,9 +213,9 @@ Widget _buildModeCard(Map<String, dynamic> item) {
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: extra.cardBackground,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0xFFE5E7EB)),
+      border: Border.all(color: extra.cardBorder),
     ),
     child: Row(
       children: [
@@ -233,8 +236,8 @@ Widget _buildModeCard(Map<String, dynamic> item) {
         const Spacer(),
         Text(
           '$sessionsCount ta | ${avgPercentage.toStringAsFixed(1)}% | ${_formatDuration(avgDurationSec.round())}',
-          style: const TextStyle(
-            color: Color(0xFF6B7280),
+          style: TextStyle(
+            color: extra.textSecondary,
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
@@ -244,7 +247,8 @@ Widget _buildModeCard(Map<String, dynamic> item) {
   );
 }
 
-Widget _buildRecentResultCard(Map<String, dynamic> item) {
+Widget _buildRecentResultCard(BuildContext context, Map<String, dynamic> item) {
+  final extra = context.appColors;
   final mode = (item['mode'] ?? '').toString();
   final percentage = (item['percentage'] ?? 0.0) as double;
   final score = (item['score'] ?? 0) as int;
@@ -258,9 +262,9 @@ Widget _buildRecentResultCard(Map<String, dynamic> item) {
     margin: const EdgeInsets.only(bottom: 12),
     padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: extra.cardBackground,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: const Color(0xFFE5E7EB)),
+      border: Border.all(color: extra.cardBorder),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -278,8 +282,8 @@ Widget _buildRecentResultCard(Map<String, dynamic> item) {
             const Spacer(),
             Text(
               '${percentage.toStringAsFixed(1)}%',
-              style: const TextStyle(
-                color: Color(0xFF111827),
+              style: TextStyle(
+                color: extra.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
               ),
@@ -289,8 +293,8 @@ Widget _buildRecentResultCard(Map<String, dynamic> item) {
         const SizedBox(height: 6),
         Text(
           '$score / $total  |  ${_formatDuration(durationSec)}',
-          style: const TextStyle(
-            color: Color(0xFF6B7280),
+          style: TextStyle(
+            color: extra.textSecondary,
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
@@ -299,8 +303,8 @@ Widget _buildRecentResultCard(Map<String, dynamic> item) {
           const SizedBox(height: 8),
           Text(
             [bookName, topicName].where((e) => e.isNotEmpty).join(' • '),
-            style: const TextStyle(
-              color: Color(0xFF6B7280),
+            style: TextStyle(
+              color: extra.textSecondary,
               fontSize: 12,
             ),
           ),
@@ -308,8 +312,8 @@ Widget _buildRecentResultCard(Map<String, dynamic> item) {
         const SizedBox(height: 6),
         Text(
           _formatDateTime(completedAt),
-          style: const TextStyle(
-            color: Color(0xFF9CA3AF),
+          style: TextStyle(
+            color: extra.textSecondary.withValues(alpha: 0.72),
             fontSize: 12,
           ),
         ),

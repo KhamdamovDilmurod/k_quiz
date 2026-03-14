@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:k_quiz/config/app_theme_colors.dart';
 
 class LearningMethodCard extends StatefulWidget {
   final IconData icon;
@@ -25,6 +26,7 @@ class _LearningMethodCardState extends State<LearningMethodCard> {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
@@ -37,8 +39,9 @@ class _LearningMethodCardState extends State<LearningMethodCard> {
         transform: Matrix4.identity()..scale(_isPressed ? 0.97 : 1.0),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: extra.cardBackground,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: extra.cardBorder),
           boxShadow: [
             BoxShadow(
               color: _isPressed
@@ -78,26 +81,26 @@ class _LearningMethodCardState extends State<LearningMethodCard> {
                 children: [
                   Text(
                     widget.title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
+                      color: extra.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     widget.subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF6B7280),
+                      color: extra.textSecondary,
                     ),
                   ),
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios_rounded,
-              color: Color(0xFF9CA3AF),
+              color: extra.textSecondary.withValues(alpha: 0.7),
               size: 20,
             ),
           ],
