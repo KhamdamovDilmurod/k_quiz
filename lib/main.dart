@@ -26,8 +26,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:k_quiz/config/theme_config.dart';
-import 'package:k_quiz/config/theme_cubit.dart';
+import 'package:k_quiz/config/theme/theme_config.dart';
+import 'package:k_quiz/config/theme/theme_cubit.dart';
 import 'package:k_quiz/presentations/pages/auth/auth_bloc.dart';
 import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
 import 'package:k_quiz/presentations/pages/auth/registr_screen.dart';

@@ -75,6 +75,7 @@ class _GradientCardState extends State<GradientCard> {
           ],
         ),
         child: Container(
+          width: double.infinity,
           padding: widget.padding ?? const EdgeInsets.all(20),
           child: widget.child,
         ),

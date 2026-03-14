@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/data/bloc/base/base_state.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/ui/common/custom_appbar.dart';

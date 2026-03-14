@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 
 class LearningMethodCard extends StatefulWidget {
   final IconData icon;

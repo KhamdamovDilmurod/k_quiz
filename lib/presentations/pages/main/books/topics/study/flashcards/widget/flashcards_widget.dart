@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/common/study_result_dialog.dart';
 import 'package:k_quiz/utils/extensions.dart';
 

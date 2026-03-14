@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/data/models/word.dart';
 import 'package:k_quiz/data/repositories/word_repository.dart';
 import 'package:k_quiz/data/repositories/study_progress_repository.dart';
@@ -21,12 +21,30 @@ class TestWidget extends StatefulWidget {
 
 class _TestWidgetState extends State<TestWidget> {
   int? timeLimit;
+  int? questionLimit;
   bool showTimerDialog = true;
+  late List<Word> _testWords;
+
+  @override
+  void initState() {
+    super.initState();
+    _testWords = widget.words;
+    questionLimit = widget.words.length >= 10 ? 10 : null;
+  }
 
   void _startTest() {
+    final words = List<Word>.from(widget.words)..shuffle();
+    final count = _resolvedQuestionCount(questionLimit);
     setState(() {
+      _testWords = words.take(count).toList();
       showTimerDialog = false;
     });
+  }
+
+  int _resolvedQuestionCount(int? limit) {
+    if (limit == null) return widget.words.length;
+    if (limit > widget.words.length) return widget.words.length;
+    return limit;
   }
 
   @override
@@ -34,25 +52,30 @@ class _TestWidgetState extends State<TestWidget> {
     final extra = context.appColors;
     if (showTimerDialog) {
       return Center(
-        child: Container(
-          margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: extra.cardBackground,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.82,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 32,vertical: 8),
+            decoration: BoxDecoration(
+              color: extra.cardBackground,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
@@ -64,59 +87,94 @@ class _TestWidgetState extends State<TestWidget> {
                 ),
                 child: Icon(
                   Icons.timer_rounded,
-                  size: 48,
+                  size: 32,
                   color: extra.success,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Text(
                 'Har bir savol uchun vaqt chegarasi',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: extra.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
               _buildTimeOption('10 soniya', 10),
               _buildTimeOption('20 soniya', 20),
               _buildTimeOption('30 soniya', 30),
               _buildTimeOption('Cheksiz vaqt', null),
-              const SizedBox(height: 32),
-              GradientCard(
-                margin: EdgeInsets.zero,
-                padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-                borderRadius: 16,
-                gradientColors: [
-                  extra.success,
-                  extra.success.withValues(alpha: 0.82),
-                ],
-                onTap: _startTest,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
-                    SizedBox(width: 8),
-                    Text(
-                      'Boshlash',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+              Text(
+                'Savollar soni',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: extra.textPrimary,
                 ),
               ),
-            ],
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildQuestionCountOption(
+                      label: '10 ta',
+                      count: 10,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildQuestionCountOption(
+                      label: '20 ta',
+                      count: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildQuestionCountOption(
+                      label: 'Barchasi',
+                      count: null,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+                  GradientCard(
+                    margin: EdgeInsets.zero,
+                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+                    borderRadius: 16,
+                    gradientColors: [
+                      extra.success,
+                      extra.success.withValues(alpha: 0.82),
+                    ],
+                    onTap: _startTest,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const [
+                        Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+                        SizedBox(width: 8),
+                        Text(
+                          'Boshlash',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       );
     }
 
-    return TestQuizWidget(words: widget.words, timeLimit: timeLimit);
+    return TestQuizWidget(words: _testWords, timeLimit: timeLimit);
   }
 
   Widget _buildTimeOption(String label, int? seconds) {
@@ -125,7 +183,7 @@ class _TestWidgetState extends State<TestWidget> {
     return GestureDetector(
       onTap: () => setState(() => timeLimit = seconds),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
@@ -161,6 +219,55 @@ class _TestWidgetState extends State<TestWidget> {
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 color: isSelected ? extra.success : extra.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionCountOption({
+    required String label,
+    required int? count,
+  }) {
+    final extra = context.appColors;
+    final isSelected = questionLimit == count;
+    final effectiveCount = count == null
+        ? widget.words.length
+        : (count > widget.words.length ? widget.words.length : count);
+
+    return GestureDetector(
+      onTap: () => setState(() => questionLimit = count),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? extra.gradientStart.withValues(alpha: 0.12)
+              : extra.mutedSurface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? extra.gradientStart : extra.cardBorder,
+            width: 1.6,
+          ),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: isSelected ? extra.gradientStart : extra.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              '$effectiveCount savol',
+              style: TextStyle(
+                fontSize: 11,
+                color: extra.textSecondary,
               ),
             ),
           ],

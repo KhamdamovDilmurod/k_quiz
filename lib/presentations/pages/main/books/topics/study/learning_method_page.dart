@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/matching/matching_page.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/test/test_page.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_page.dart';

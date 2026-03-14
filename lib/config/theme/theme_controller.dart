@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../utils/pref_utils.dart';
+import '../../utils/pref_utils.dart';
 
 class ThemeController extends ChangeNotifier {
   final PrefUtils _prefUtils;

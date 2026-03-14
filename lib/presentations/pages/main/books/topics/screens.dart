@@ -4,8 +4,8 @@ import '../../../../../data/repositories/word_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../config/app_theme_colors.dart';
-import '../../../../../config/theme_cubit.dart';
+import '../../../../../config/theme/app_theme_colors.dart';
+import '../../../../../config/theme/theme_cubit.dart';
 
 import '../../../../../services/google_sheets_service.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/flashcards/widget/flashcards_widget.dart';
 import '../../../../../../../data/bloc/base/base_state.dart';
 import '../../../../../../../di/service_locator.dart';

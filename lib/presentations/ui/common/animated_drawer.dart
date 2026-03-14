@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/data/models/user_model.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/main/about/about_page.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:k_quiz/config/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/topics_page.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
