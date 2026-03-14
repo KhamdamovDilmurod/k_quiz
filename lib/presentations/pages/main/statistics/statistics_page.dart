@@ -46,6 +46,8 @@ Widget _buildPage(BuildContext context) {
               return const Center(child: CircularProgressIndicator());
             }
 
+
+
             if (state is StatisticsLoadedState) {
               final totalSessions = (state.summary['total_sessions'] ?? 0) as int;
               if (totalSessions == 0) {
