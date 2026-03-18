@@ -5,23 +5,39 @@ import 'package:sqflite/sqflite.dart';
 
 import '../config/google_sheets_config.dart';
 
+typedef ImportProgressCallback = void Function(double progress, String message);
+
 class GoogleSheetsService {
   final Database db;
 
   GoogleSheetsService(this.db);
 
   // Barcha ma'lumotlarni import qilish
-  Future<Map<String, int>> importAllFromGoogleSheets() async {
+  Future<Map<String, int>> importAllFromGoogleSheets({
+    ImportProgressCallback? onProgress,
+  }) async {
     try {
       print('📚 Import boshlandi...');
 
+      onProgress?.call(0.15, 'Eski ma\'lumotlar tozalanmoqda...');
       await clearAllData();
 
+      onProgress?.call(0.30, 'Kitoblar yuklanmoqda...');
       final booksCount = await importBooks();
+
+      onProgress?.call(0.55, 'Mavzular yuklanmoqda...');
       final topicsCount = await importTopics();
-      final wordsCount = await importWords();
+
+      onProgress?.call(0.75, 'So\'zlar yuklanmoqda...');
+      final wordsCount = await importWords(
+        onChunkSaved: (count) {
+          final progress = (0.75 + (count / 5000) * 0.20).clamp(0.75, 0.95);
+          onProgress?.call(progress, '$count ta so\'z saqlandi...');
+        },
+      );
 
       print('✅ Import tugadi!');
+      onProgress?.call(1.0, 'Ma\'lumotlar tayyor!');
 
       return {
         'books': booksCount,
@@ -100,7 +116,9 @@ class GoogleSheetsService {
   }
 
   // Words import
-  Future<int> importWords() async {
+  Future<int> importWords({
+    void Function(int count)? onChunkSaved,
+  }) async {
     final url = GoogleSheetsConfig.getWordsUrl();
     final response = await http.get(Uri.parse(url));
 
@@ -133,6 +151,7 @@ class GoogleSheetsService {
         await batch.commit(noResult: true);
         batch = db.batch();
         print('  → $count ta so\'z...');
+        onChunkSaved?.call(count);
       }
     }
 
@@ -140,6 +159,7 @@ class GoogleSheetsService {
       await batch.commit(noResult: true);
     }
 
+    onChunkSaved?.call(count);
     print('✓ Words: $count ta');
     return count;
   }

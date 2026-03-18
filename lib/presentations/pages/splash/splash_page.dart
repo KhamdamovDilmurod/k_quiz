@@ -1,11 +1,13 @@
-// splash/splash_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
-import 'package:k_quiz/presentations/pages/main/books/books_page.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/di/service_locator.dart';
+import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
+import 'package:k_quiz/presentations/pages/auth/widgets/auth_chrome.dart';
+import 'package:k_quiz/presentations/pages/main/books/books_page.dart';
 import 'package:k_quiz/services/google_sheets_service.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
+
 import 'splash_cubit.dart';
 
 class SplashPage extends StatelessWidget {
@@ -15,7 +17,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => SplashCubit(getIt<GoogleSheetsService>())..initialize(),
-      child: SplashView(),
+      child: const SplashView(),
     );
   }
 }
@@ -25,6 +27,9 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
+    final theme = Theme.of(context);
+
     return BlocListener<SplashCubit, SplashState>(
       listener: (context, state) {
         if (state.status == SplashStatus.success) {
@@ -37,212 +42,207 @@ class SplashView extends StatelessWidget {
               transitionsBuilder: (context, animation, secondaryAnimation, child) {
                 return FadeTransition(opacity: animation, child: child);
               },
-              transitionDuration: const Duration(milliseconds: 500),
+              transitionDuration: const Duration(milliseconds: 450),
             ),
           );
         }
       },
       child: Scaffold(
-        body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.blue.shade400,
-                Colors.blue.shade700,
-              ],
-            ),
-          ),
-          child: BlocBuilder<SplashCubit, SplashState>(
-            builder: (context, state) {
-              if (state.status == SplashStatus.error) {
-                return Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 80,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          'Xatolik yuz berdi',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Text(
-                          state.errorMessage ?? 'Noma\'lum xatolik',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white.withOpacity(0.9),
-                          ),
-                        ),
-                        SizedBox(height: 32),
-                        ElevatedButton.icon(
-                          onPressed: () => context.read<SplashCubit>().initialize(),
-                          icon: Icon(Icons.refresh),
-                          label: Text('Qayta urinish'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: Colors.blue.shade700,
-                            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-
-              // Loading state with animation
-              return SafeArea(
-                child: Column(
-                  children: [
-                    Spacer(flex: 2),
-
-                    // Animated Logo
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: Duration(milliseconds: 800),
-                      curve: Curves.easeOutBack,
-                      builder: (context, value, child) {
-                        return Transform.scale(
-                          scale: value,
-                          child: Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 20,
-                                  offset: Offset(0, 10),
-                                ),
-                              ],
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(4),
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    SizedBox(height: 24),
-
-                    // App Title with fade animation
-                    TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: Duration(milliseconds: 1000),
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Text(
-                            'Korean Quiz',
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 1.2,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-
-                    SizedBox(height: 8),
-
-                    Text(
-                      '한국어를 배우자!',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white.withOpacity(0.9),
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-
-                    Spacer(flex: 3),
-
-                    // Progress Section
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 48),
+        body: AuthDecoratedBackground(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+            child: BlocBuilder<SplashCubit, SplashState>(
+              builder: (context, state) {
+                if (state.status == SplashStatus.error) {
+                  return Center(
+                    child: AuthSurfaceCard(
                       child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          // Progress Bar
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: SizedBox(
-                              height: 8,
-                              child: TweenAnimationBuilder<double>(
-                                tween: Tween(begin: 0.0, end: state.progress),
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                builder: (context, value, child) {
-                                  return LinearProgressIndicator(
-                                    value: value,
-                                    backgroundColor: Colors.white.withOpacity(0.3),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  );
-                                },
-                              ),
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: extra.danger.withValues(alpha: 0.12),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.error_outline_rounded,
+                              size: 34,
+                              color: extra.danger,
                             ),
                           ),
-
-                          SizedBox(height: 16),
-
-                          // Progress Percentage
+                          const SizedBox(height: 20),
                           Text(
-                            '${(state.progress * 100).toInt()}%',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                            'Yuklashda xatolik',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: extra.textPrimary,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-
-                          SizedBox(height: 8),
-
-                          // Loading Message with animation
-                          AnimatedSwitcher(
-                            duration: Duration(milliseconds: 300),
-                            child: Text(
-                              state.loadingMessage,
-                              key: ValueKey(state.loadingMessage),
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.9),
+                          const SizedBox(height: 10),
+                          Text(
+                            state.errorMessage ?? 'Noma\'lum xatolik',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: extra.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    extra.gradientStart,
+                                    extra.gradientEnd,
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: ElevatedButton.icon(
+                                onPressed: () => context.read<SplashCubit>().initialize(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                ),
+                                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                                label: const Text(
+                                  'Qayta urinish',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
+                  );
+                }
 
-                    SizedBox(height: 48),
-                  ],
-                ),
-              );
-            },
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 540),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const AuthBrandHeader(
+                          title: 'Korean Quiz',
+                          logoSize: 112,
+                        ),
+                        const SizedBox(height: 28),
+                        AuthSurfaceCard(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          extra.gradientStart,
+                                          extra.gradientEnd,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: const Icon(
+                                      Icons.cloud_download_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Ilova ishga tayyorlanmoqda',
+                                          style: theme.textTheme.titleMedium?.copyWith(
+                                            color: extra.textPrimary,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Progress real yuklanish holatiga bog‘langan.',
+                                          style: theme.textTheme.bodyMedium?.copyWith(
+                                            color: extra.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 24),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(999),
+                                child: TweenAnimationBuilder<double>(
+                                  tween: Tween<double>(
+                                    begin: 0,
+                                    end: state.progress.clamp(0.0, 1.0),
+                                  ),
+                                  duration: const Duration(milliseconds: 220),
+                                  builder: (context, value, child) {
+                                    return LinearProgressIndicator(
+                                      value: value,
+                                      minHeight: 12,
+                                      backgroundColor:
+                                          extra.mutedSurface.withValues(alpha: 0.9),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        extra.gradientStart,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: AnimatedSwitcher(
+                                      duration: const Duration(milliseconds: 220),
+                                      child: Text(
+                                        state.loadingMessage,
+                                        key: ValueKey(state.loadingMessage),
+                                        style: theme.textTheme.bodyMedium?.copyWith(
+                                          color: extra.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '${(state.progress * 100).toInt()}%',
+                                    style: theme.textTheme.titleMedium?.copyWith(
+                                      color: extra.textPrimary,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),

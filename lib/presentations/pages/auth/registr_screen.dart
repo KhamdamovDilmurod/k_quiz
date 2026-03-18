@@ -1,7 +1,8 @@
-// lib/screens/register_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
+import 'package:k_quiz/presentations/pages/auth/widgets/auth_chrome.dart';
+
 import 'auth_bloc.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -52,33 +53,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (widget.isGoogleFlow) {
       context.read<AuthBloc>().add(
-        AuthGoogleSignInRequested(displayName: _nameController.text.trim()),
-      );
+            AuthGoogleSignInRequested(displayName: _nameController.text.trim()),
+          );
       return;
     }
 
     context.read<AuthBloc>().add(
-      AuthRegisterRequested(
-        _emailController.text,
-        _passwordController.text,
-        displayName: _nameController.text.trim(),
-      ),
-    );
+          AuthRegisterRequested(
+            _emailController.text.trim(),
+            _passwordController.text,
+            displayName: _nameController.text.trim(),
+          ),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.isGoogleFlow ? 'Google orqali ro\'yxat' : 'Ro\'yxatdan o\'tish'),
-        backgroundColor: Colors.blue.shade700,
-        foregroundColor: Colors.white,
-      ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: extra.danger,
+              ),
             );
           }
 
@@ -89,227 +90,442 @@ class _RegisterScreenState extends State<RegisterScreen> {
         builder: (context, state) {
           final isLoading = state is AuthLoading;
 
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.blue.shade400, Colors.blue.shade700],
-              ),
-            ),
-            child: SafeArea(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 20)],
-                          ),
-                          padding: const EdgeInsets.all(16),
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.contain,
-                            errorBuilder: (_, __, ___) =>
-                                const Icon(Icons.book, size: 60, color: Colors.blue),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        Text(
-                          'Korean Quiz',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        if (widget.initialPhotoUrl != null) ...[
-                          const SizedBox(height: 12),
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundImage: NetworkImage(widget.initialPhotoUrl!),
-                          ),
-                        ],
-                        const SizedBox(height: 48),
-                        TextFormField(
-                          controller: _nameController,
-                          enabled: !isLoading,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: 'Ism',
-                            labelStyle: const TextStyle(color: Colors.white70),
-                            prefixIcon: const Icon(Icons.person_outline, color: Colors.white),
-                            filled: true,
-                            fillColor: Colors.white24,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                          validator: (v) =>
-                              v == null || v.trim().isEmpty ? 'Ism kiriting' : null,
-                        ),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          enabled: !isLoading && !widget.isGoogleFlow,
-                          style: const TextStyle(color: Colors.white),
-                          decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: const TextStyle(color: Colors.white70),
-                            prefixIcon: const Icon(Icons.email_outlined, color: Colors.white),
-                            filled: true,
-                            fillColor: Colors.white24,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                          validator: (v) =>
-                              v == null || v.trim().isEmpty ? 'Email kiriting' : null,
-                        ),
-                        if (!widget.isGoogleFlow) ...[
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscurePassword,
-                            enabled: !isLoading,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Parol',
-                              labelStyle: const TextStyle(color: Colors.white70),
-                              prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscurePassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: Colors.white,
+          return AuthDecoratedBackground(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth >= 900;
+
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: isWide ? 1040 : 540,
+                      ),
+                      child: isWide
+                          ? Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 18),
+                                    child: _RegisterInfoPanel(
+                                      isGoogleFlow: widget.isGoogleFlow,
+                                      photoUrl: widget.initialPhotoUrl,
+                                    ),
+                                  ),
                                 ),
-                                onPressed: () =>
-                                    setState(() => _obscurePassword = !_obscurePassword),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white24,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            validator: (v) {
-                              if (v?.isEmpty ?? true) return 'Parol kiriting';
-                              if (v!.length < 6) return 'Kamida 6 ta belgi';
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            controller: _confirmPasswordController,
-                            obscureText: _obscureConfirmPassword,
-                            enabled: !isLoading,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Parolni tasdiqlang',
-                              labelStyle: const TextStyle(color: Colors.white70),
-                              prefixIcon: const Icon(Icons.lock_outlined, color: Colors.white),
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureConfirmPassword
-                                      ? Icons.visibility_outlined
-                                      : Icons.visibility_off_outlined,
-                                  color: Colors.white,
+                                Expanded(
+                                  child: _RegisterFormPanel(
+                                    formKey: _formKey,
+                                    nameController: _nameController,
+                                    emailController: _emailController,
+                                    passwordController: _passwordController,
+                                    confirmPasswordController:
+                                        _confirmPasswordController,
+                                    isLoading: isLoading,
+                                    isGoogleFlow: widget.isGoogleFlow,
+                                    obscurePassword: _obscurePassword,
+                                    obscureConfirmPassword:
+                                        _obscureConfirmPassword,
+                                    onTogglePassword: () {
+                                      setState(() => _obscurePassword = !_obscurePassword);
+                                    },
+                                    onToggleConfirmPassword: () {
+                                      setState(() {
+                                        _obscureConfirmPassword =
+                                            !_obscureConfirmPassword;
+                                      });
+                                    },
+                                    onSubmit: _onRegisterPressed,
+                                  ),
                                 ),
-                                onPressed: () => setState(
-                                  () => _obscureConfirmPassword = !_obscureConfirmPassword,
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white24,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            validator: (v) {
-                              if (v?.isEmpty ?? true) return 'Parolni tasdiqlang';
-                              if (v != _passwordController.text) {
-                                return 'Parollar mos kelmadi';
-                              }
-                              return null;
-                            },
-                          ),
-                        ],
-                        const SizedBox(height: 32),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 50,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : _onRegisterPressed,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.blue.shade700,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: isLoading
-                                ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.blue.shade700,
-                              ),
+                              ],
                             )
-                                : Text(
-                              widget.isGoogleFlow
-                                  ? 'Google bilan ro\'yxatdan o\'tish'
-                                  : 'Ro\'yxatdan o\'tish',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Akkountingiz bormi? ',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text(
-                                'Kirish',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _RegisterTopHeader(isGoogleFlow: widget.isGoogleFlow),
+                                const SizedBox(height: 14),
+                                _RegisterFormPanel(
+                                  formKey: _formKey,
+                                  nameController: _nameController,
+                                  emailController: _emailController,
+                                  passwordController: _passwordController,
+                                  confirmPasswordController:
+                                      _confirmPasswordController,
+                                  isLoading: isLoading,
+                                  isGoogleFlow: widget.isGoogleFlow,
+                                  obscurePassword: _obscurePassword,
+                                  obscureConfirmPassword:
+                                      _obscureConfirmPassword,
+                                  onTogglePassword: () {
+                                    setState(() => _obscurePassword = !_obscurePassword);
+                                  },
+                                  onToggleConfirmPassword: () {
+                                    setState(() {
+                                      _obscureConfirmPassword =
+                                          !_obscureConfirmPassword;
+                                    });
+                                  },
+                                  onSubmit: _onRegisterPressed,
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ],
                     ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _RegisterTopHeader extends StatelessWidget {
+  final bool isGoogleFlow;
+
+  const _RegisterTopHeader({required this.isGoogleFlow});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Container(
+          width: 54,
+          height: 54,
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.16),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+          ),
+          child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isGoogleFlow ? 'Profilni yakunlang' : 'Ro\'yxatdan o\'ting',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                isGoogleFlow ? 'Google hisob bilan davom eting' : 'Yangi hisob oching',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.8),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _RegisterInfoPanel extends StatelessWidget {
+  final bool isGoogleFlow;
+  final String? photoUrl;
+  final bool compact;
+
+  const _RegisterInfoPanel({
+    required this.isGoogleFlow,
+    required this.photoUrl,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(compact ? 18 : 28),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: compact ? 0.10 : 0.12),
+        borderRadius: BorderRadius.circular(compact ? 24 : 32),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!compact) ...[
+            AuthBrandHeader(
+              title: isGoogleFlow ? 'Profilni yakunlang' : 'Yangi akkaunt',
+              logoSize: 94,
+            ),
+            const SizedBox(height: 18),
+          ],
+          if (photoUrl != null) ...[
+            CircleAvatar(
+              radius: compact ? 22 : 28,
+              backgroundImage: NetworkImage(photoUrl!),
+            ),
+            SizedBox(height: compact ? 10 : 14),
+          ],
+          Text(
+            isGoogleFlow
+                ? 'Ismni tekshirib, davom eting.'
+                : 'Hisob yarating va mashqlarni boshlang.',
+            style: theme.textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          SizedBox(height: compact ? 8 : 10),
+          Text(
+            isGoogleFlow
+                ? 'Qo\'shimcha parol kiritmasdan profilni tez yakunlaysiz.'
+                : 'Barcha darslar, saqlangan so\'zlar va progress akkauntingizga ulanadi.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.78),
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RegisterFormPanel extends StatelessWidget {
+  final GlobalKey<FormState> formKey;
+  final TextEditingController nameController;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+  final TextEditingController confirmPasswordController;
+  final bool isLoading;
+  final bool isGoogleFlow;
+  final bool obscurePassword;
+  final bool obscureConfirmPassword;
+  final VoidCallback onTogglePassword;
+  final VoidCallback onToggleConfirmPassword;
+  final VoidCallback onSubmit;
+
+  const _RegisterFormPanel({
+    required this.formKey,
+    required this.nameController,
+    required this.emailController,
+    required this.passwordController,
+    required this.confirmPasswordController,
+    required this.isLoading,
+    required this.isGoogleFlow,
+    required this.obscurePassword,
+    required this.obscureConfirmPassword,
+    required this.onTogglePassword,
+    required this.onToggleConfirmPassword,
+    required this.onSubmit,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final extra = context.appColors;
+    final theme = Theme.of(context);
+
+    return AuthSurfaceCard(
+      padding: const EdgeInsets.all(22),
+      child: Form(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              isGoogleFlow ? 'Hisob ma\'lumotlari' : 'Ro\'yxatdan o\'tish',
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: extra.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isGoogleFlow
+                  ? 'Profilni tasdiqlab davom eting.'
+                  : 'Yangi akkaunt uchun maydonlarni to\'ldiring.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: extra.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 18),
+            TextFormField(
+              controller: nameController,
+              enabled: !isLoading,
+              style: TextStyle(color: extra.textPrimary),
+              decoration: authInputDecoration(
+                context,
+                label: 'Ism',
+                icon: Icons.person_outline_rounded,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Ism kiriting';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              enabled: !isLoading && !isGoogleFlow,
+              style: TextStyle(color: extra.textPrimary),
+              decoration: authInputDecoration(
+                context,
+                label: 'Email',
+                icon: Icons.alternate_email_rounded,
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Email kiriting';
+                }
+                return null;
+              },
+            ),
+            if (!isGoogleFlow) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: passwordController,
+                      obscureText: obscurePassword,
+                      enabled: !isLoading,
+                      style: TextStyle(color: extra.textPrimary),
+                      decoration: authInputDecoration(
+                        context,
+                        label: 'Parol',
+                        icon: Icons.lock_outline_rounded,
+                        suffixIcon: IconButton(
+                          onPressed: onTogglePassword,
+                          icon: Icon(
+                            obscurePassword
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                            color: extra.textSecondary,
+                          ),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Parol kiriting';
+                        }
+                        if (value.length < 6) {
+                          return 'Kamida 6 ta belgi';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: confirmPasswordController,
+                obscureText: obscureConfirmPassword,
+                enabled: !isLoading,
+                style: TextStyle(color: extra.textPrimary),
+                decoration: authInputDecoration(
+                  context,
+                  label: 'Parolni tasdiqlang',
+                  icon: Icons.verified_user_outlined,
+                  suffixIcon: IconButton(
+                    onPressed: onToggleConfirmPassword,
+                    icon: Icon(
+                      obscureConfirmPassword
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
+                      color: extra.textSecondary,
+                    ),
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Parolni tasdiqlang';
+                  }
+                  if (value != passwordController.text) {
+                    return 'Parollar mos kelmadi';
+                  }
+                  return null;
+                },
+              ),
+            ],
+            const SizedBox(height: 18),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [extra.gradientStart, extra.gradientEnd],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : onSubmit,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    disabledBackgroundColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          isGoogleFlow
+                              ? 'Google bilan davom etish'
+                              : 'Ro\'yxatdan o\'tish',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    'Akkountingiz bormi? ',
+                    style: TextStyle(color: extra.textSecondary),
+                  ),
+                  TextButton(
+                    onPressed: isLoading ? null : () => Navigator.pop(context),
+                    child: Text(
+                      'Kirish',
+                      style: TextStyle(
+                        color: extra.gradientStart,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

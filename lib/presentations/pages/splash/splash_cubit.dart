@@ -4,6 +4,8 @@ import 'package:k_quiz/services/google_sheets_service.dart';
 
 enum SplashStatus { loading, success, error }
 
+const _noValue = Object();
+
 class SplashState {
   final SplashStatus status;
   final String? errorMessage;
@@ -19,13 +21,14 @@ class SplashState {
 
   SplashState copyWith({
     SplashStatus? status,
-    String? errorMessage,
+    Object? errorMessage = _noValue,
     double? progress,
     String? loadingMessage,
   }) {
     return SplashState(
       status: status ?? this.status,
-      errorMessage: errorMessage ?? this.errorMessage,
+      errorMessage:
+          identical(errorMessage, _noValue) ? this.errorMessage : errorMessage as String?,
       progress: progress ?? this.progress,
       loadingMessage: loadingMessage ?? this.loadingMessage,
     );
@@ -34,64 +37,64 @@ class SplashState {
 
 class SplashCubit extends Cubit<SplashState> {
   final GoogleSheetsService _sheetsService;
+  bool _isInitializing = false;
 
   SplashCubit(this._sheetsService)
       : super(SplashState(status: SplashStatus.loading));
 
   Future<void> initialize() async {
+    if (_isInitializing) return;
+    _isInitializing = true;
+
     try {
       emit(state.copyWith(
         status: SplashStatus.loading,
-        progress: 0.0,
-        loadingMessage: 'Ilovani tayyorlanmoqda...',
+        errorMessage: null,
+        progress: 0.05,
+        loadingMessage: 'Ilova tayyorlanmoqda...',
       ));
-
-      await Future.delayed(Duration(milliseconds: 500));
-      emit(state.copyWith(progress: 0.2));
-
-      emit(state.copyWith(
-        progress: 0.3,
-        loadingMessage: 'Ma\'lumotlar bazasini tekshirish...',
-      ));
-
-      await Future.delayed(Duration(milliseconds: 300));
 
       // Database bo'sh yoki yo'qligini tekshirish
+      emit(state.copyWith(
+        progress: 0.10,
+        loadingMessage: 'Ma\'lumotlar bazasi tekshirilmoqda...',
+      ));
       final isEmpty = await _sheetsService.isDatabaseEmpty();
-      emit(state.copyWith(progress: 0.5));
 
       if (isEmpty) {
-        emit(state.copyWith(
-          progress: 0.6,
-          loadingMessage: 'Darsliklar yuklanmoqda...',
-        ));
-
-        // Google Sheets'dan data import qilish
-        await _sheetsService.importAllFromGoogleSheets();
-
-        emit(state.copyWith(progress: 0.9));
+        await _sheetsService.importAllFromGoogleSheets(
+          onProgress: (progress, message) {
+            if (isClosed) return;
+            emit(state.copyWith(
+              status: SplashStatus.loading,
+              progress: progress,
+              loadingMessage: message,
+            ));
+          },
+        );
       } else {
         emit(state.copyWith(
-          progress: 0.8,
-          loadingMessage: 'Ma\'lumotlar tayyor!',
+          progress: 1.0,
+          loadingMessage: 'Saqlangan ma\'lumotlar tayyor!',
         ));
       }
 
-      await Future.delayed(Duration(milliseconds: 500));
-
-      emit(state.copyWith(
-        progress: 1.0,
-        loadingMessage: 'Tayyor!',
-      ));
-
-      await Future.delayed(Duration(milliseconds: 300));
-      emit(state.copyWith(status: SplashStatus.success));
-
+      if (!isClosed) {
+        emit(state.copyWith(
+          status: SplashStatus.success,
+          progress: 1.0,
+          loadingMessage: 'Tayyor!',
+        ));
+      }
     } catch (e) {
-      emit(state.copyWith(
-        status: SplashStatus.error,
-        errorMessage: e.toString(),
-      ));
+      if (!isClosed) {
+        emit(state.copyWith(
+          status: SplashStatus.error,
+          errorMessage: e.toString(),
+        ));
+      }
+    } finally {
+      _isInitializing = false;
     }
   }
 }
