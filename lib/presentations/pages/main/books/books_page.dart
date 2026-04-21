@@ -88,33 +88,132 @@ Widget _buildPage(BuildContext context) {
 
 void _showLogoutDialog(BuildContext context) {
   final extra = context.appColors;
+  final theme = Theme.of(context);
   showDialog(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      title: Text('Chiqish'),
-      content: Text('Haqiqatan ham chiqmoqchimisiz?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(dialogContext),
-          child: Text('Yo\'q'),
+    barrierColor: Colors.black.withValues(alpha: 0.35),
+    builder: (dialogContext) => Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: extra.cardBackground,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(color: extra.cardBorder.withValues(alpha: 0.75)),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.shadow.withValues(alpha: 0.18),
+              blurRadius: 28,
+              offset: const Offset(0, 16),
+            ),
+          ],
         ),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(dialogContext);
-            // AuthBloc-ga signout event yuborish
-            context.read<AuthBloc>().add(AuthSignOutRequested());
-            // Barcha sahifalarni tozalash va login sahifasiga o'tish
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => LoginScreen()),
-                  (route) => false,
-            );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: extra.danger,
-          ),
-          child: Text('Ha, chiqish'),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    extra.danger,
+                    extra.danger.withValues(alpha: 0.78),
+                  ],
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.logout_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'Chiqish',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: extra.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Haqiqatan ham akkauntingizdan chiqmoqchimisiz?',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: extra.textSecondary,
+                height: 1.4,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(50),
+                      side: BorderSide(color: extra.cardBorder),
+                      backgroundColor: extra.mutedSurface.withValues(alpha: 0.55),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      'Bekor qilish',
+                      style: TextStyle(
+                        color: extra.textPrimary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          extra.danger,
+                          extra.danger.withValues(alpha: 0.82),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        context.read<AuthBloc>().add(AuthSignOutRequested());
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (route) => false,
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text(
+                        'Ha, chiqish',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      ],
+      ),
     ),
   );
 }

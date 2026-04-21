@@ -264,11 +264,11 @@ class _FeatureGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 220,
         mainAxisSpacing: 12,
         crossAxisSpacing: 12,
-        childAspectRatio: 0.92,
+        mainAxisExtent: 172,
       ),
       itemBuilder: (context, index) {
         final item = items[index];
@@ -300,13 +300,14 @@ class _FeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final extra = context.appColors;
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
         color: extra.cardBackground,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: extra.cardBorder),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
@@ -318,7 +319,7 @@ class _FeatureCard extends StatelessWidget {
             ),
             child: Icon(icon, color: color),
           ),
-          const Spacer(),
+          const SizedBox(height: 18),
           Text(
             title,
             style: TextStyle(
@@ -328,12 +329,14 @@ class _FeatureCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text(
-            text,
-            style: TextStyle(
-              color: extra.textSecondary,
-              fontSize: 12,
-              height: 1.45,
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: extra.textSecondary,
+                fontSize: 12,
+                height: 1.45,
+              ),
             ),
           ),
         ],

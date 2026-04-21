@@ -49,105 +49,56 @@ class SplashView extends StatelessWidget {
       },
       child: Scaffold(
         body: AuthDecoratedBackground(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-            child: BlocBuilder<SplashCubit, SplashState>(
-              builder: (context, state) {
-                if (state.status == SplashStatus.error) {
-                  return Center(
-                    child: AuthSurfaceCard(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 72,
-                            height: 72,
-                            decoration: BoxDecoration(
-                              color: extra.danger.withValues(alpha: 0.12),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.error_outline_rounded,
-                              size: 34,
-                              color: extra.danger,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'Yuklashda xatolik',
-                            style: theme.textTheme.headlineSmall?.copyWith(
-                              color: extra.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            state.errorMessage ?? 'Noma\'lum xatolik',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: extra.textSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 52,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    extra.gradientStart,
-                                    extra.gradientEnd,
-                                  ],
-                                ),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                              child: ElevatedButton.icon(
-                                onPressed: () => context.read<SplashCubit>().initialize(),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.transparent,
-                                  shadowColor: Colors.transparent,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - 36,
+                  ),
+                  child: BlocBuilder<SplashCubit, SplashState>(
+                    builder: (context, state) {
+                      if (state.status == SplashStatus.error) {
+                        return Center(
+                          child: AuthSurfaceCard(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 72,
+                                  height: 72,
+                                  decoration: BoxDecoration(
+                                    color: extra.danger.withValues(alpha: 0.12),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.error_outline_rounded,
+                                    size: 34,
+                                    color: extra.danger,
                                   ),
                                 ),
-                                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                                label: const Text(
-                                  'Qayta urinish',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                const SizedBox(height: 20),
+                                Text(
+                                  'Yuklashda xatolik',
+                                  style: theme.textTheme.headlineSmall?.copyWith(
+                                    color: extra.textPrimary,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
-
-                return Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 540),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const AuthBrandHeader(
-                          title: 'Korean Quiz',
-                          logoSize: 112,
-                        ),
-                        const SizedBox(height: 28),
-                        AuthSurfaceCard(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 44,
-                                    height: 44,
+                                const SizedBox(height: 10),
+                                Text(
+                                  state.errorMessage ?? 'Noma\'lum xatolik',
+                                  textAlign: TextAlign.center,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: extra.textSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 52,
+                                  child: DecoratedBox(
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
@@ -155,94 +106,152 @@ class SplashView extends StatelessWidget {
                                           extra.gradientEnd,
                                         ],
                                       ),
-                                      borderRadius: BorderRadius.circular(14),
+                                      borderRadius: BorderRadius.circular(18),
                                     ),
-                                    child: const Icon(
-                                      Icons.cloud_download_rounded,
-                                      color: Colors.white,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () => context.read<SplashCubit>().initialize(),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.transparent,
+                                        shadowColor: Colors.transparent,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(18),
+                                        ),
+                                      ),
+                                      icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                                      label: const Text(
+                                        'Qayta urinish',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      return Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 540),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const AuthBrandHeader(
+                                title: 'Korean Quiz',
+                                logoSize: 112,
+                              ),
+                              const SizedBox(height: 28),
+                              AuthSurfaceCard(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Row(
                                       children: [
-                                        Text(
-                                          'Ilova ishga tayyorlanmoqda',
-                                          style: theme.textTheme.titleMedium?.copyWith(
-                                            color: extra.textPrimary,
-                                            fontWeight: FontWeight.w700,
+                                        Container(
+                                          width: 44,
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                extra.gradientStart,
+                                                extra.gradientEnd,
+                                              ],
+                                            ),
+                                            borderRadius: BorderRadius.circular(14),
+                                          ),
+                                          child: const Icon(
+                                            Icons.cloud_download_rounded,
+                                            color: Colors.white,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Progress real yuklanish holatiga bog‘langan.',
-                                          style: theme.textTheme.bodyMedium?.copyWith(
-                                            color: extra.textSecondary,
+                                        const SizedBox(width: 14),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Ilova ishga tayyorlanmoqda',
+                                                style: theme.textTheme.titleMedium?.copyWith(
+                                                  color: extra.textPrimary,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Progress real yuklanish holatiga bog‘langan.',
+                                                style: theme.textTheme.bodyMedium?.copyWith(
+                                                  color: extra.textSecondary,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(999),
-                                child: TweenAnimationBuilder<double>(
-                                  tween: Tween<double>(
-                                    begin: 0,
-                                    end: state.progress.clamp(0.0, 1.0),
-                                  ),
-                                  duration: const Duration(milliseconds: 220),
-                                  builder: (context, value, child) {
-                                    return LinearProgressIndicator(
-                                      value: value,
-                                      minHeight: 12,
-                                      backgroundColor:
-                                          extra.mutedSurface.withValues(alpha: 0.9),
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                        extra.gradientStart,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: AnimatedSwitcher(
-                                      duration: const Duration(milliseconds: 220),
-                                      child: Text(
-                                        state.loadingMessage,
-                                        key: ValueKey(state.loadingMessage),
-                                        style: theme.textTheme.bodyMedium?.copyWith(
-                                          color: extra.textSecondary,
+                                    const SizedBox(height: 24),
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(999),
+                                      child: TweenAnimationBuilder<double>(
+                                        tween: Tween<double>(
+                                          begin: 0,
+                                          end: state.progress.clamp(0.0, 1.0),
                                         ),
+                                        duration: const Duration(milliseconds: 220),
+                                        builder: (context, value, child) {
+                                          return LinearProgressIndicator(
+                                            value: value,
+                                            minHeight: 12,
+                                            backgroundColor:
+                                                extra.mutedSurface.withValues(alpha: 0.9),
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              extra.gradientStart,
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '${(state.progress * 100).toInt()}%',
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      color: extra.textPrimary,
-                                      fontWeight: FontWeight.w800,
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: AnimatedSwitcher(
+                                            duration: const Duration(milliseconds: 220),
+                                            child: Text(
+                                              state.loadingMessage,
+                                              key: ValueKey(state.loadingMessage),
+                                              style: theme.textTheme.bodyMedium?.copyWith(
+                                                color: extra.textSecondary,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          '${(state.progress * 100).toInt()}%',
+                                          style: theme.textTheme.titleMedium?.copyWith(
+                                            color: extra.textPrimary,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),

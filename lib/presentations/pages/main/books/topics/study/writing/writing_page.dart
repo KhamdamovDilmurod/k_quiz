@@ -3,22 +3,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/writing/writing_widgets.dart';
 
-import '../../../../../../../data/bloc/base/base_state.dart';
 import '../../../../../../../di/service_locator.dart';
 import '../../../../../../ui/common/custom_appbar.dart';
 import '../../../../../../ui/common/empty_state.dart';
-import '../flashcards/flashcards_bloc.dart';
+import 'writing_bloc.dart';
 
 class WritingPage extends StatelessWidget {
   final int topicId;
 
-  const WritingPage({Key? key, required this.topicId}) : super(key: key);
+  const WritingPage({super.key, required this.topicId});
 
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => FlashcardsBloc(getIt.get(), topicId)..add(LoadWordsEvent()),
+      create: (context) =>
+          WritingBloc(getIt.get(), topicId)..add(const LoadWritingWordsEvent()),
       child: Builder(builder: (context) => _buildPage(context)),
     );
   }
@@ -37,13 +37,13 @@ Widget _buildPage(BuildContext context) {
       ),
     ),
     body: SafeArea(
-      child: BlocBuilder<FlashcardsBloc, BaseState>(
+      child: BlocBuilder<WritingBloc, WritingState>(
         builder: (context, state) {
-          if (state is ShowLoadingState && state.show) {
+          if (state is WritingLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state is WordsLoadedState) {
+          if (state is WritingLoaded) {
             final words = state.words;
 
             if (words.isEmpty) {
@@ -55,32 +55,28 @@ Widget _buildPage(BuildContext context) {
             }
 
             return WritingWidget(
-              words: [
-                {'korean': '안녕', 'translation': 'Salom', 'difficulty': 'easy'},
-                {'korean': '감사', 'translation': 'Rahmat', 'difficulty': 'easy'},
-                // ... boshqa so'zlar
-              ],
+              words: words,
             );
           }
 
-          if (state is ShowErrorMessage) {
+          if (state is WritingError) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
                     size: 64,
-                    color: Colors.red,
+                    color: extra.danger,
                   ),
                   const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Text(
                       state.message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF6B7280),
+                        color: extra.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -88,10 +84,12 @@ Widget _buildPage(BuildContext context) {
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<FlashcardsBloc>().add(RefreshWordsEvent());
+                      context.read<WritingBloc>().add(
+                        const RefreshWritingWordsEvent(),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6B46C1),
+                      backgroundColor: extra.gradientStart,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
                         vertical: 12,

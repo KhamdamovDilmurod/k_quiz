@@ -76,24 +76,51 @@ class _LoginScreenState extends State<LoginScreen> {
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth >= 900;
 
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: isWide ? 1040 : 520,
-                      ),
-                      child: isWide
-                          ? Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 18),
-                                    child: _LoginInfoPanel(compact: false),
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 28,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: isWide ? 1040 : 520,
+                        ),
+                        child: isWide
+                            ? Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 18),
+                                      child: _LoginInfoPanel(compact: false),
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: _LoginFormPanel(
+                                  Expanded(
+                                    child: _LoginFormPanel(
+                                      formKey: _formKey,
+                                      emailController: _emailController,
+                                      passwordController: _passwordController,
+                                      obscurePassword: _obscurePassword,
+                                      isLoading: isLoading,
+                                      isGoogleLoading: _isGoogleLoading,
+                                      onTogglePassword: () {
+                                        setState(() => _obscurePassword = !_obscurePassword);
+                                      },
+                                      onSubmit: _submit,
+                                      onGoogle: _continueWithGoogle,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const _CompactBrandHeader(
+                                    title: 'Korean Quiz',
+                                  ),
+                                  const SizedBox(height: 14),
+                                  _LoginFormPanel(
                                     formKey: _formKey,
                                     emailController: _emailController,
                                     passwordController: _passwordController,
@@ -106,31 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     onSubmit: _submit,
                                     onGoogle: _continueWithGoogle,
                                   ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const _CompactBrandHeader(
-                                  title: 'Korean Quiz',
-                                ),
-                                const SizedBox(height: 14),
-                                _LoginFormPanel(
-                                  formKey: _formKey,
-                                  emailController: _emailController,
-                                  passwordController: _passwordController,
-                                  obscurePassword: _obscurePassword,
-                                  isLoading: isLoading,
-                                  isGoogleLoading: _isGoogleLoading,
-                                  onTogglePassword: () {
-                                    setState(() => _obscurePassword = !_obscurePassword);
-                                  },
-                                  onSubmit: _submit,
-                                  onGoogle: _continueWithGoogle,
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                      ),
                     ),
                   ),
                 );
@@ -175,8 +180,6 @@ class _LoginInfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(compact ? 18 : 28),
@@ -445,44 +448,6 @@ class _CompactBrandHeader extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _InfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _InfoChip({
-    required this.icon,
-    required this.label,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: Colors.white, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

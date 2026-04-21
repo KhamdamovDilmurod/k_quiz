@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/presentations/pages/main/books/topics/study/matching/widget/matching_widget.dart';
 
 import '../../../../../../../data/bloc/base/base_state.dart';
@@ -11,7 +12,7 @@ import '../flashcards/flashcards_bloc.dart';
 class MatchingPage extends StatelessWidget {
   final int topicId;
 
-  const MatchingPage({Key? key, required this.topicId}) : super(key: key);
+  const MatchingPage({super.key, required this.topicId});
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +24,15 @@ class MatchingPage extends StatelessWidget {
 }
 
 Widget _buildPage(BuildContext context) {
+  final extra = context.appColors;
+
   return Scaffold(
-    backgroundColor: const Color(0xFFF5F5F7),
+    backgroundColor: Theme.of(context).scaffoldBackgroundColor,
     appBar: CustomAppBar(
       title: "Matching",
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1F2937)),
+        icon: Icon(Icons.arrow_back_ios_new, color: extra.textPrimary),
         onPressed: () => Navigator.pop(context),
       ),
     ),
@@ -67,19 +70,19 @@ Widget _buildPage(BuildContext context) {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
                     size: 64,
-                    color: Colors.red,
+                    color: extra.danger,
                   ),
                   const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Text(
                       state.message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF6B7280),
+                        color: extra.textSecondary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -90,7 +93,7 @@ Widget _buildPage(BuildContext context) {
                       context.read<FlashcardsBloc>().add(RefreshWordsEvent());
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6B46C1),
+                      backgroundColor: extra.gradientStart,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 32,
                         vertical: 12,

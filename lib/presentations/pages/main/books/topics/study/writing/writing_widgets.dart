@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:async';
 import 'dart:math';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
+import 'package:k_quiz/data/models/word.dart';
 
 class WritingWidget extends StatefulWidget {
-  final List<Map<String, dynamic>> words;
+  final List<Word> words;
 
-  const WritingWidget({Key? key, required this.words}) : super(key: key);
+  const WritingWidget({super.key, required this.words});
 
   @override
   State<WritingWidget> createState() => _WritingWidgetState();
@@ -14,7 +16,7 @@ class WritingWidget extends StatefulWidget {
 
 class _WritingWidgetState extends State<WritingWidget> with SingleTickerProviderStateMixin {
   String currentDifficulty = 'hard'; // Faqat qiyin daraja
-  List<Map<String, dynamic>> filteredWords = [];
+  List<Word> filteredWords = [];
   int currentWordIndex = 0;
   List<HiddenJamo> hiddenJamos = [];
   int score = 0;
@@ -30,7 +32,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
   late Animation<double> _messageAnimation;
   late ScrollController _scrollController;
   TextEditingController? _activeController;
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -181,7 +183,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
     if (filteredWords.isEmpty) return;
 
     final word = filteredWords[currentWordIndex];
-    final syllables = word['korean'].split('');
+    final syllables = word.koreanWord.split('');
 
     message = '';
     _messageController.reset();
@@ -273,19 +275,20 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final extra = context.appColors;
     if (filteredWords.isEmpty) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: Color(0xFF6B46C1),
+          color: extra.gradientStart,
         ),
       );
     }
 
     final word = filteredWords[currentWordIndex];
-    final syllables = word['korean'].split('');
+    final syllables = word.koreanWord.split('');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -299,18 +302,18 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                     children: [
                       Text(
                         '${currentWordIndex + 1} / ${filteredWords.length}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF6B7280),
+                          color: extra.textSecondary,
                         ),
                       ),
                       Text(
                         '${((currentWordIndex + 1) / filteredWords.length * 100).toInt()}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF6B46C1),
+                          color: extra.gradientStart,
                         ),
                       ),
                     ],
@@ -320,8 +323,8 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                     borderRadius: BorderRadius.circular(10),
                     child: LinearProgressIndicator(
                       value: (currentWordIndex + 1) / filteredWords.length,
-                      backgroundColor: const Color(0xFFE5E7EB),
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6B46C1)),
+                      backgroundColor: extra.cardBorder,
+                      valueColor: AlwaysStoppedAnimation<Color>(extra.gradientStart),
                       minHeight: 8,
                     ),
                   ),
@@ -339,32 +342,32 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                       'Ochko',
                       score.toString(),
                       Icons.emoji_events_rounded,
-                      const Color(0xFF6B46C1),
+                      extra.gradientStart,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: _buildStatCard(
                       'To\'g\'ri',
                       correctCount.toString(),
                       Icons.check_circle_rounded,
-                      const Color(0xFF10B981),
+                      extra.success,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: _buildStatCard(
                       'Vaqt',
                       getTimerText(),
                       Icons.timer_rounded,
-                      const Color(0xFF3B82F6),
+                      extra.warning,
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             // Main Card
             Expanded(
@@ -373,15 +376,15 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Container(
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                    gradient: LinearGradient(
+                      colors: [extra.gradientStart, extra.gradientEnd],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF3B82F6).withOpacity(0.3),
+                        color: extra.gradientEnd.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       ),
@@ -398,7 +401,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                           height: 150,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                           ),
                         ),
                       ),
@@ -410,7 +413,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                           height: 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.1),
+                            color: Colors.white.withValues(alpha: 0.1),
                           ),
                         ),
                       ),
@@ -422,9 +425,13 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                           children: [
                             // Question
                             Container(
-                              padding: const EdgeInsets.all(4),
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Row(
@@ -433,18 +440,20 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                                   const Icon(
                                     Icons.translate_rounded,
                                     color: Colors.white,
-                                    size: 24,
+                                    size: 20,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Flexible(
+                                  const SizedBox(width: 6),
+                                  Expanded(
                                     child: Text(
-                                      word['translation'],
+                                      word.uzbekWord,
                                       style: const TextStyle(
-                                        fontSize: 28,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                       textAlign: TextAlign.center,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
@@ -455,8 +464,8 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
 
                             // Syllables
                             Wrap(
-                              spacing: 16,
-                              runSpacing: 16,
+                              spacing: 8,
+                              runSpacing: 8,
                               alignment: WrapAlignment.center,
                               children: syllables.asMap().entries.map<Widget>((entry) {
                                 return _buildSyllableBox(entry.value, entry.key);
@@ -470,39 +479,44 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                               FadeTransition(
                                 opacity: _messageAnimation,
                                 child: Container(
+                                  width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 12,
+                                    horizontal: 14,
+                                    vertical: 10,
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSuccess
-                                        ? const Color(0xFF10B981).withOpacity(0.2)
-                                        : const Color(0xFFEF4444).withOpacity(0.2),
+                                        ? extra.success.withValues(alpha: 0.2)
+                                        : extra.danger.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: isSuccess
-                                          ? const Color(0xFF10B981)
-                                          : const Color(0xFFEF4444),
+                                          ? extra.success
+                                          : extra.danger,
                                       width: 2,
                                     ),
                                   ),
                                   child: Row(
-                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisSize: MainAxisSize.max,
                                     children: [
                                       Icon(
                                         isSuccess
                                             ? Icons.check_circle_rounded
                                             : Icons.cancel_rounded,
                                         color: Colors.white,
-                                        size: 20,
+                                        size: 18,
                                       ),
                                       const SizedBox(width: 8),
-                                      Text(
-                                        message,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
+                                      Expanded(
+                                        child: Text(
+                                          message,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
@@ -528,19 +542,19 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                 children: [
                   _buildIconButton(
                     Icons.lightbulb_outline_rounded,
-                    const Color(0xFFF59E0B),
+                    extra.warning,
                     showHint,
                   ),
                   const SizedBox(width: 16),
                   _buildIconButton(
                     Icons.check_circle_outline_rounded,
-                    const Color(0xFF10B981),
+                    extra.success,
                     checkAnswer,
                   ),
                   const SizedBox(width: 16),
                   _buildIconButton(
                     Icons.arrow_forward_rounded,
-                    const Color(0xFF6B46C1),
+                    extra.gradientStart,
                     nextWord,
                   ),
                 ],
@@ -558,36 +572,43 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
   }
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+    final extra = context.appColors;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        color: extra.cardBackground,
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: extra.textPrimary.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1.5),
           ),
         ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Icon(
+            icon,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(height: 2),
           Text(
             value,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 9,
-              color: Color(0xFF6B7280),
+            style: TextStyle(
+              fontSize: 8,
+              color: extra.textSecondary,
             ),
           ),
         ],
@@ -603,14 +624,14 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
         height: 50,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [color, color.withOpacity(0.8)],
+            colors: [color, color.withValues(alpha: 0.8)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.3),
+              color: color.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -626,6 +647,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
   }
 
   Widget _buildSyllableBox(String syllable, int syllableIndex) {
+    final extra = context.appColors;
     final jamos = decomposeHangul(syllable);
     if (jamos == null) return const SizedBox();
 
@@ -633,18 +655,18 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
     final hasFinal = jamos.finalConsonant != null;
 
     return Container(
-      width: 140,
-      padding: const EdgeInsets.all(12),
+      width: 74,
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: extra.cardBackground,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.white.withOpacity(0.3),
-          width: 2,
+          color: extra.cardBorder.withValues(alpha: 0.6),
+          width: 1.4,
         ),
       ),
       child: SizedBox(
-        height: 110,
+        height: 70,
         child: hasFinal
             ? (isVertical
             ? _buildVerticalWithFinal(jamos, syllableIndex)
@@ -663,12 +685,12 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
           child: Row(
             children: [
               Expanded(child: _buildJamoCell(jamos.initial, 'initial', syllableIndex)),
-              const SizedBox(width: 4),
+              const SizedBox(width: 2),
               Expanded(child: _buildJamoCell(jamos.vowel, 'vowel', syllableIndex)),
             ],
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Expanded(child: _buildJamoCell(jamos.finalConsonant!, 'final', syllableIndex)),
       ],
     );
@@ -678,12 +700,12 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
     return Column(
       children: [
         Expanded(child: _buildJamoCell(jamos.initial, 'initial', syllableIndex)),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Expanded(
           child: Row(
             children: [
               Expanded(child: _buildJamoCell(jamos.vowel, 'vowel', syllableIndex)),
-              const SizedBox(width: 4),
+              const SizedBox(width: 2),
               Expanded(child: _buildJamoCell(jamos.finalConsonant!, 'final', syllableIndex)),
             ],
           ),
@@ -696,7 +718,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
     return Row(
       children: [
         Expanded(child: _buildJamoCell(jamos.initial, 'initial', syllableIndex)),
-        const SizedBox(width: 4),
+        const SizedBox(width: 2),
         Expanded(child: _buildJamoCell(jamos.vowel, 'vowel', syllableIndex)),
       ],
     );
@@ -706,13 +728,14 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
     return Column(
       children: [
         Expanded(child: _buildJamoCell(jamos.initial, 'initial', syllableIndex)),
-        const SizedBox(height: 4),
+        const SizedBox(height: 2),
         Expanded(child: _buildJamoCell(jamos.vowel, 'vowel', syllableIndex)),
       ],
     );
   }
 
   Widget _buildJamoCell(String char, String type, int syllableIndex) {
+    final extra = context.appColors;
     final hiddenJamo = hiddenJamos.firstWhere(
           (h) => h.syllableIndex == syllableIndex && h.type == type,
       orElse: () => HiddenJamo(
@@ -724,33 +747,33 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
       ),
     );
 
-    Color bgColor = const Color(0xFFF9FAFB);
-    Color borderColor = const Color(0xFFE5E7EB);
-    Color textColor = const Color(0xFF1F2937);
+    Color bgColor = extra.mutedSurface;
+    Color borderColor = extra.cardBorder;
+    Color textColor = extra.textPrimary;
 
     if (hiddenJamo.isHint) {
-      bgColor = const Color(0xFF3B82F6).withOpacity(0.1);
-      borderColor = const Color(0xFF3B82F6);
-      textColor = const Color(0xFF3B82F6);
+      bgColor = extra.warning.withValues(alpha: 0.12);
+      borderColor = extra.warning;
+      textColor = extra.warning;
     } else if (hiddenJamo.isCorrect) {
-      bgColor = const Color(0xFF10B981).withOpacity(0.1);
-      borderColor = const Color(0xFF10B981);
-      textColor = const Color(0xFF10B981);
+      bgColor = extra.success.withValues(alpha: 0.12);
+      borderColor = extra.success;
+      textColor = extra.success;
     } else if (hiddenJamo.isIncorrect) {
-      bgColor = const Color(0xFFEF4444).withOpacity(0.1);
-      borderColor = const Color(0xFFEF4444);
-      textColor = const Color(0xFFEF4444);
+      bgColor = extra.danger.withValues(alpha: 0.12);
+      borderColor = extra.danger;
+      textColor = extra.danger;
     } else if (hiddenJamo.isHidden) {
-      bgColor = Colors.white;
-      borderColor = const Color(0xFF3B82F6);
+      bgColor = extra.cardBackground;
+      borderColor = extra.gradientStart;
     }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: bgColor,
-        border: Border.all(color: borderColor, width: 2),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor, width: 1.6),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Center(
         child: hiddenJamo.isHidden
@@ -774,9 +797,8 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
             child: Text(
               hiddenJamo.controller.text.isEmpty ? '' : hiddenJamo.controller.text,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
               ),
             ),
           ),
@@ -784,7 +806,7 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
             : Text(
           char,
           style: TextStyle(
-            fontSize: 20,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
             color: textColor,
           ),
@@ -793,48 +815,8 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
     );
   }
 
-  Widget _buildActionButton(String text, Color color, VoidCallback onPressed,
-      {bool fullWidth = false}) {
-    return Container(
-      width: fullWidth ? double.infinity : null,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [color, color.withOpacity(0.8)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Text(
-              text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildCustomKeyboard() {
+    final extra = context.appColors;
     // Koreys jamo harflari
     const initialConsonants = [
       'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ',
@@ -860,10 +842,10 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: extra.cardBackground,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: extra.textPrimary.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, -5),
           ),
@@ -877,26 +859,26 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
             // Keyboard header
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: Color(0xFFE5E7EB), width: 1),
+                  bottom: BorderSide(color: extra.cardBorder, width: 1),
                 ),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Koreys harflari',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF6B7280),
+                      color: extra.textSecondary,
                     ),
                   ),
                   if (_activeController != null)
                     IconButton(
                       icon: const Icon(Icons.backspace_outlined, size: 20),
-                      color: const Color(0xFFEF4444),
+                      color: extra.danger,
                       onPressed: () {
                         if (_activeController != null) {
                           _activeController!.clear();
@@ -940,20 +922,20 @@ class _WritingWidgetState extends State<WritingWidget> with SingleTickerProvider
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF9FAFB),
+                        color: extra.mutedSurface,
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: const Color(0xFFE5E7EB),
+                          color: extra.cardBorder,
                           width: 1,
                         ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         jamo,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF1F2937),
+                          color: extra.textPrimary,
                         ),
                       ),
                     ),

@@ -3,9 +3,11 @@ import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/data/models/user_model.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/main/about/about_page.dart';
+import 'package:k_quiz/presentations/pages/main/chizmachilik/chizmachilik_page.dart';
 import 'package:k_quiz/presentations/pages/main/saved/saved_words_page.dart';
 import 'package:k_quiz/presentations/pages/main/statistics/statistics_page.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../pages/main/books/topics/screens.dart';
 
@@ -23,10 +25,12 @@ class AnimatedDrawer extends StatefulWidget {
 class _AnimatedDrawerState extends State<AnimatedDrawer> {
   String selectedItem = 'Kitoblar'; // Default tanlangan item
   UserModel? get _user => getIt<PrefUtils>().getUserData();
+  late final Future<PackageInfo> _packageInfoFuture;
 
   @override
   void initState() {
     super.initState();
+    _packageInfoFuture = PackageInfo.fromPlatform();
     // Route bo'yicha default itemni belgilash
     if (widget.currentRoute != null) {
       _setSelectedFromRoute(widget.currentRoute!);
@@ -149,6 +153,29 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                           navigator.push(
                             MaterialPageRoute(
                               builder: (_) => const StatisticsPage(),
+                            ),
+                          );
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuItem(
+                      icon: Icons.sports_martial_arts,
+                      title: 'Chizmachilik',
+                      gradientColors: [
+                        const Color(0xFF10B981),
+                        const Color(0xFF059669),
+                      ],
+                      isSelected: selectedItem == 'Chizmachilik',
+                      onTap: () {
+                        final navigator = Navigator.of(context);
+                        setState(() => selectedItem = 'Chizmachilik');
+                        navigator.pop();
+                        Future.delayed(const Duration(milliseconds: 250), () {
+                          if (!mounted) return;
+                          navigator.push(
+                            MaterialPageRoute(
+                              builder: (_) => const ChizmachilikPage(),
                             ),
                           );
                         });
@@ -404,24 +431,34 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
     final extra = context.appColors;
     return Container(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Text(
-            'K-Quiz v1.0.0',
-            style: TextStyle(
-              color: extra.textSecondary,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '© 2024 Barcha huquqlar himoyalangan',
-            style: TextStyle(
-              color: extra.textSecondary.withValues(alpha: 0.72),
-              fontSize: 10,
-            ),
-          ),
-        ],
+      child: FutureBuilder<PackageInfo>(
+        future: _packageInfoFuture,
+        builder: (context, snapshot) {
+          final packageInfo = snapshot.data;
+          final versionText = packageInfo == null
+              ? 'K-Quiz'
+              : 'K-Quiz v${packageInfo.version}';
+
+          return Column(
+            children: [
+              Text(
+                versionText,
+                style: TextStyle(
+                  color: extra.textSecondary,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '© 2024 Barcha huquqlar himoyalangan',
+                style: TextStyle(
+                  color: extra.textSecondary.withValues(alpha: 0.72),
+                  fontSize: 10,
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

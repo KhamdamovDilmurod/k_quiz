@@ -342,9 +342,9 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                       horizontal: screenWidth * 0.03,
                       vertical: screenHeight * 0.01,
                     ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [extra.gradientStart, extra.gradientEnd],
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [extra.gradientStart, extra.gradientEnd],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -374,11 +374,11 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                       horizontal: screenWidth * 0.03,
                       vertical: screenHeight * 0.01,
                     ),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          extra.success,
-                          extra.success.withValues(alpha: 0.82),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            extra.success,
+                            extra.success.withValues(alpha: 0.82),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(12),
@@ -470,7 +470,7 @@ class _MatchingWidgetState extends State<MatchingWidget> with TickerProviderStat
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.05),
+                            color: extra.textPrimary.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),

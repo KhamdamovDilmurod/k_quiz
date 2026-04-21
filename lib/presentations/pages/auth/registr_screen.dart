@@ -53,18 +53,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (widget.isGoogleFlow) {
       context.read<AuthBloc>().add(
-            AuthGoogleSignInRequested(displayName: _nameController.text.trim()),
-          );
+        AuthGoogleSignInRequested(displayName: _nameController.text.trim()),
+      );
       return;
     }
 
     context.read<AuthBloc>().add(
-          AuthRegisterRequested(
-            _emailController.text.trim(),
-            _passwordController.text,
-            displayName: _nameController.text.trim(),
-          ),
-        );
+      AuthRegisterRequested(
+        _emailController.text.trim(),
+        _passwordController.text,
+        displayName: _nameController.text.trim(),
+      ),
+    );
   }
 
   @override
@@ -84,7 +84,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
 
           if (state is AuthAuthenticated) {
-            Navigator.pushNamedAndRemoveUntil(context, '/books', (route) => false);
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              '/books',
+              (route) => false,
+            );
           }
         },
         builder: (context, state) {
@@ -95,27 +99,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth >= 900;
 
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: isWide ? 1040 : 540,
-                      ),
-                      child: isWide
-                          ? Row(
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 18),
-                                    child: _RegisterInfoPanel(
-                                      isGoogleFlow: widget.isGoogleFlow,
-                                      photoUrl: widget.initialPhotoUrl,
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight - 28,
+                    ),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: isWide ? 1040 : 540,
+                        ),
+                        child: isWide
+                            ? Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 18),
+                                      child: _RegisterInfoPanel(
+                                        isGoogleFlow: widget.isGoogleFlow,
+                                        photoUrl: widget.initialPhotoUrl,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: _RegisterFormPanel(
+                                  Expanded(
+                                    child: _RegisterFormPanel(
+                                      formKey: _formKey,
+                                      nameController: _nameController,
+                                      emailController: _emailController,
+                                      passwordController: _passwordController,
+                                      confirmPasswordController:
+                                          _confirmPasswordController,
+                                      isLoading: isLoading,
+                                      isGoogleFlow: widget.isGoogleFlow,
+                                      obscurePassword: _obscurePassword,
+                                      obscureConfirmPassword:
+                                          _obscureConfirmPassword,
+                                      onTogglePassword: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                      onToggleConfirmPassword: () {
+                                        setState(() {
+                                          _obscureConfirmPassword =
+                                              !_obscureConfirmPassword;
+                                        });
+                                      },
+                                      onSubmit: _onRegisterPressed,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  _RegisterTopHeader(
+                                    isGoogleFlow: widget.isGoogleFlow,
+                                  ),
+                                  const SizedBox(height: 14),
+                                  _RegisterFormPanel(
                                     formKey: _formKey,
                                     nameController: _nameController,
                                     emailController: _emailController,
@@ -128,7 +171,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     obscureConfirmPassword:
                                         _obscureConfirmPassword,
                                     onTogglePassword: () {
-                                      setState(() => _obscurePassword = !_obscurePassword);
+                                      setState(() {
+                                        _obscurePassword = !_obscurePassword;
+                                      });
                                     },
                                     onToggleConfirmPassword: () {
                                       setState(() {
@@ -138,39 +183,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     },
                                     onSubmit: _onRegisterPressed,
                                   ),
-                                ),
-                              ],
-                            )
-                          : Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _RegisterTopHeader(isGoogleFlow: widget.isGoogleFlow),
-                                const SizedBox(height: 14),
-                                _RegisterFormPanel(
-                                  formKey: _formKey,
-                                  nameController: _nameController,
-                                  emailController: _emailController,
-                                  passwordController: _passwordController,
-                                  confirmPasswordController:
-                                      _confirmPasswordController,
-                                  isLoading: isLoading,
-                                  isGoogleFlow: widget.isGoogleFlow,
-                                  obscurePassword: _obscurePassword,
-                                  obscureConfirmPassword:
-                                      _obscureConfirmPassword,
-                                  onTogglePassword: () {
-                                    setState(() => _obscurePassword = !_obscurePassword);
-                                  },
-                                  onToggleConfirmPassword: () {
-                                    setState(() {
-                                      _obscureConfirmPassword =
-                                          !_obscureConfirmPassword;
-                                    });
-                                  },
-                                  onSubmit: _onRegisterPressed,
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                      ),
                     ),
                   ),
                 );
@@ -219,7 +234,9 @@ class _RegisterTopHeader extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                isGoogleFlow ? 'Google hisob bilan davom eting' : 'Yangi hisob oching',
+                isGoogleFlow
+                    ? 'Google hisob bilan davom eting'
+                    : 'Yangi hisob oching',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white.withValues(alpha: 0.8),
                 ),
@@ -235,12 +252,10 @@ class _RegisterTopHeader extends StatelessWidget {
 class _RegisterInfoPanel extends StatelessWidget {
   final bool isGoogleFlow;
   final String? photoUrl;
-  final bool compact;
 
   const _RegisterInfoPanel({
     required this.isGoogleFlow,
     required this.photoUrl,
-    this.compact = false,
   });
 
   @override
@@ -249,29 +264,27 @@ class _RegisterInfoPanel extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(compact ? 18 : 28),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: compact ? 0.10 : 0.12),
-        borderRadius: BorderRadius.circular(compact ? 24 : 32),
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (!compact) ...[
-            AuthBrandHeader(
-              title: isGoogleFlow ? 'Profilni yakunlang' : 'Yangi akkaunt',
-              logoSize: 94,
-            ),
-            const SizedBox(height: 18),
-          ],
+          AuthBrandHeader(
+            title: isGoogleFlow ? 'Profilni yakunlang' : 'Yangi akkaunt',
+            logoSize: 94,
+          ),
+          const SizedBox(height: 18),
           if (photoUrl != null) ...[
             CircleAvatar(
-              radius: compact ? 22 : 28,
+              radius: 28,
               backgroundImage: NetworkImage(photoUrl!),
             ),
-            SizedBox(height: compact ? 10 : 14),
+            const SizedBox(height: 14),
           ],
           Text(
             isGoogleFlow
@@ -282,7 +295,7 @@ class _RegisterInfoPanel extends StatelessWidget {
               fontWeight: FontWeight.w800,
             ),
           ),
-          SizedBox(height: compact ? 8 : 10),
+          const SizedBox(height: 10),
           Text(
             isGoogleFlow
                 ? 'Qo\'shimcha parol kiritmasdan profilni tez yakunlaysiz.'
@@ -480,25 +493,26 @@ class _RegisterFormPanel extends StatelessWidget {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.2,
-                            color: Colors.white,
+                  child:
+                      isLoading
+                          ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.2,
+                              color: Colors.white,
+                            ),
+                          )
+                          : Text(
+                            isGoogleFlow
+                                ? 'Google bilan davom etish'
+                                : 'Ro\'yxatdan o\'tish',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      : Text(
-                          isGoogleFlow
-                              ? 'Google bilan davom etish'
-                              : 'Ro\'yxatdan o\'tish',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
                 ),
               ),
             ),
