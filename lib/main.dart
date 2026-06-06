@@ -59,7 +59,6 @@ void main() async {
 String _normalizeLocaleCode(String value) {
   switch (value) {
     case 'ko':
-    case 'kor':
       return 'ko';
     case 'uz':
     case 'en':

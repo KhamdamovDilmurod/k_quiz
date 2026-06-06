@@ -5,6 +5,7 @@ class Assets {
   static const String iconsOpenBook = 'assets/icons/open-book.png';
   static const String imagesLogo = 'assets/images/logo.png';
   static const String imagesMiniLogo = 'assets/images/mini_logo.png';
+  static const String langKo = 'assets/lang/ko.json';
   static const String langUz = 'assets/lang/uz.json';
   static const String lottiesCeleberate = 'assets/lotties/celeberate.json';
   static const String lottiesSatisification = 'assets/lotties/satisification.json';

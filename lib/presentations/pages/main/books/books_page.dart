@@ -94,12 +94,19 @@ Widget _buildPage(BuildContext context) {
 Widget _buildLanguageAction(BuildContext context) {
   final extra = context.appColors;
   final currentCode = context.locale.languageCode;
+  final currentLabel = currentCode == 'ko' ? 'KO' : 'UZ';
 
   return PopupMenuButton<Locale>(
     tooltip: 'settings.language'.tr(),
     onSelected: (locale) => _changeLanguage(context, locale),
-    offset: const Offset(0, 48),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    offset: const Offset(0, 50),
+    color: extra.cardBackground,
+    elevation: 12,
+    shadowColor: Colors.black.withValues(alpha: 0.16),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(18),
+      side: BorderSide(color: extra.cardBorder),
+    ),
     itemBuilder:
         (context) => [
           PopupMenuItem(
@@ -107,6 +114,7 @@ Widget _buildLanguageAction(BuildContext context) {
             child: _buildLanguageMenuItem(
               context: context,
               title: 'languages.uz'.tr(),
+              subtitle: 'languages.uz_native'.tr(),
               selected: currentCode == 'uz',
             ),
           ),
@@ -115,20 +123,53 @@ Widget _buildLanguageAction(BuildContext context) {
             child: _buildLanguageMenuItem(
               context: context,
               title: 'languages.ko'.tr(),
+              subtitle: 'languages.ko_native'.tr(),
               selected: currentCode == 'ko',
             ),
           ),
         ],
     child: Container(
-      width: 40,
+      constraints: const BoxConstraints(minWidth: 76),
       height: 40,
       margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: extra.cardBackground.withValues(alpha: 0.76),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: extra.cardBorder),
+        gradient: LinearGradient(
+          colors: [
+            extra.gradientStart.withValues(alpha: 0.95),
+            extra.gradientEnd.withValues(alpha: 0.95),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: extra.gradientEnd.withValues(alpha: 0.18),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Icon(Icons.language_rounded, color: extra.textPrimary, size: 22),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.language_rounded, color: Colors.white, size: 20),
+          const SizedBox(width: 7),
+          Text(
+            currentLabel,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(width: 2),
+          const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.white,
+            size: 18,
+          ),
+        ],
+      ),
     ),
   );
 }
@@ -136,18 +177,59 @@ Widget _buildLanguageAction(BuildContext context) {
 Widget _buildLanguageMenuItem({
   required BuildContext context,
   required String title,
+  required String subtitle,
   required bool selected,
 }) {
-  return Row(
-    children: [
-      Expanded(child: Text(title)),
-      if (selected)
-        Icon(
-          Icons.check_rounded,
-          color: Theme.of(context).colorScheme.primary,
-          size: 20,
+  final extra = context.appColors;
+
+  return Container(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      children: [
+        Container(
+          width: 38,
+          height: 38,
+          decoration: BoxDecoration(
+            color:
+                selected
+                    ? Theme.of(
+                      context,
+                    ).colorScheme.primary.withValues(alpha: 0.14)
+                    : extra.mutedSurface.withValues(alpha: 0.74),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            selected ? Icons.check_circle_rounded : Icons.translate_rounded,
+            color:
+                selected
+                    ? Theme.of(context).colorScheme.primary
+                    : extra.textSecondary,
+            size: 20,
+          ),
         ),
-    ],
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: extra.textPrimary,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(color: extra.textSecondary, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
   );
 }
 
