@@ -222,9 +222,6 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       color: Theme.of(context).dividerColor,
                       thickness: 1,
                     ),
-                    const SizedBox(height: 12),
-                    _buildLanguageSelector(),
-                    const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.info_rounded,
                       title: 'drawer.about'.tr(),
@@ -467,107 +464,5 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
         },
       ),
     );
-  }
-
-  Widget _buildLanguageSelector() {
-    final extra = context.appColors;
-    final currentCode = context.locale.languageCode;
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: extra.cardBackground.withValues(alpha: 0.35),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: extra.cardBorder.withValues(alpha: 0.5)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.language_rounded,
-                color: extra.textSecondary,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'settings.language'.tr(),
-                style: TextStyle(
-                  color: extra.textPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _buildLanguageButton(
-                  label: 'languages.uz'.tr(),
-                  isSelected: currentCode == 'uz',
-                  onTap: () => _changeLanguage(const Locale('uz')),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildLanguageButton(
-                  label: 'languages.ko'.tr(),
-                  isSelected: currentCode == 'ko',
-                  onTap: () => _changeLanguage(const Locale('ko')),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageButton({
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    final extra = context.appColors;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          gradient:
-              isSelected
-                  ? LinearGradient(
-                    colors: [extra.gradientStart, extra.gradientEnd],
-                  )
-                  : null,
-          color: isSelected ? null : extra.mutedSurface.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-            color: isSelected ? Colors.white : extra.textPrimary,
-            fontWeight: FontWeight.w800,
-            fontSize: 13,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _changeLanguage(Locale locale) async {
-    await context.setLocale(locale);
-    await getIt<PrefUtils>().setLang(locale.languageCode);
-    if (mounted) {
-      setState(() {});
-    }
   }
 }

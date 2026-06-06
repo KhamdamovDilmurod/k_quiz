@@ -44,6 +44,7 @@ Widget _buildPage(BuildContext context) {
       title: appBarTitle,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       showMenuButton: true,
+      actions: [_buildLanguageAction(context), const SizedBox(width: 8)],
     ),
     body: SafeArea(
       child: BlocBuilder<BooksBloc, BaseState>(
@@ -88,6 +89,71 @@ Widget _buildPage(BuildContext context) {
       ),
     ),
   );
+}
+
+Widget _buildLanguageAction(BuildContext context) {
+  final extra = context.appColors;
+  final currentCode = context.locale.languageCode;
+
+  return PopupMenuButton<Locale>(
+    tooltip: 'settings.language'.tr(),
+    onSelected: (locale) => _changeLanguage(context, locale),
+    offset: const Offset(0, 48),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    itemBuilder:
+        (context) => [
+          PopupMenuItem(
+            value: const Locale('uz'),
+            child: _buildLanguageMenuItem(
+              context: context,
+              title: 'languages.uz'.tr(),
+              selected: currentCode == 'uz',
+            ),
+          ),
+          PopupMenuItem(
+            value: const Locale('ko'),
+            child: _buildLanguageMenuItem(
+              context: context,
+              title: 'languages.ko'.tr(),
+              selected: currentCode == 'ko',
+            ),
+          ),
+        ],
+    child: Container(
+      width: 40,
+      height: 40,
+      margin: const EdgeInsets.only(right: 6),
+      decoration: BoxDecoration(
+        color: extra.cardBackground.withValues(alpha: 0.76),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: extra.cardBorder),
+      ),
+      child: Icon(Icons.language_rounded, color: extra.textPrimary, size: 22),
+    ),
+  );
+}
+
+Widget _buildLanguageMenuItem({
+  required BuildContext context,
+  required String title,
+  required bool selected,
+}) {
+  return Row(
+    children: [
+      Expanded(child: Text(title)),
+      if (selected)
+        Icon(
+          Icons.check_rounded,
+          color: Theme.of(context).colorScheme.primary,
+          size: 20,
+        ),
+    ],
+  );
+}
+
+Future<void> _changeLanguage(BuildContext context, Locale locale) async {
+  await context.setLocale(locale);
+  await getIt<PrefUtils>().setLang(locale.languageCode);
 }
 
 void _showLogoutDialog(BuildContext context) {
