@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/data/models/user_model.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/main/about/about_page.dart';
-import 'package:k_quiz/presentations/pages/main/chizmachilik/chizmachilik_page.dart';
 import 'package:k_quiz/presentations/pages/main/saved/saved_words_page.dart';
 import 'package:k_quiz/presentations/pages/main/statistics/statistics_page.dart';
 import 'package:k_quiz/utils/pref_utils.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../pages/main/books/topics/screens.dart';
+import '../../pages/main/settings/settings_screen.dart';
 
 class AnimatedDrawer extends StatefulWidget {
-
   final String? currentRoute;
   final VoidCallback? onLogout; // Joriy sahifa route'i
 
@@ -79,7 +78,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                   children: [
                     _buildMenuItem(
                       icon: Icons.home_rounded,
-                      title: 'Bosh sahifa',
+                      title: 'drawer.home'.tr(),
                       gradientColors: [
                         const Color(0xFF3B82F6),
                         const Color(0xFF2563EB),
@@ -97,7 +96,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.menu_book_rounded,
-                      title: 'Kitoblar',
+                      title: 'drawer.books'.tr(),
                       gradientColors: [
                         const Color(0xFF6B46C1),
                         const Color(0xFF9333EA),
@@ -115,7 +114,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.favorite_rounded,
-                      title: 'Sevimlilar',
+                      title: 'drawer.saved'.tr(),
                       gradientColors: [
                         const Color(0xFFEC4899),
                         const Color(0xFFDB2777),
@@ -138,7 +137,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.bar_chart_rounded,
-                      title: 'Statistika',
+                      title: 'drawer.statistics'.tr(),
                       gradientColors: [
                         const Color(0xFF10B981),
                         const Color(0xFF059669),
@@ -158,33 +157,33 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                         });
                       },
                     ),
-                    const SizedBox(height: 12),
-                    _buildMenuItem(
-                      icon: Icons.sports_martial_arts,
-                      title: 'Chizmachilik',
-                      gradientColors: [
-                        const Color(0xFF10B981),
-                        const Color(0xFF059669),
-                      ],
-                      isSelected: selectedItem == 'Chizmachilik',
-                      onTap: () {
-                        final navigator = Navigator.of(context);
-                        setState(() => selectedItem = 'Chizmachilik');
-                        navigator.pop();
-                        Future.delayed(const Duration(milliseconds: 250), () {
-                          if (!mounted) return;
-                          navigator.push(
-                            MaterialPageRoute(
-                              builder: (_) => const ChizmachilikPage(),
-                            ),
-                          );
-                        });
-                      },
-                    ),
+                    // const SizedBox(height: 12),
+                    // _buildMenuItem(
+                    //   icon: Icons.sports_martial_arts,
+                    //   title: 'Chizmachilik',
+                    //   gradientColors: [
+                    //     const Color(0xFF10B981),
+                    //     const Color(0xFF059669),
+                    //   ],
+                    //   isSelected: selectedItem == 'Chizmachilik',
+                    //   onTap: () {
+                    //     final navigator = Navigator.of(context);
+                    //     setState(() => selectedItem = 'Chizmachilik');
+                    //     navigator.pop();
+                    //     Future.delayed(const Duration(milliseconds: 250), () {
+                    //       if (!mounted) return;
+                    //       navigator.push(
+                    //         MaterialPageRoute(
+                    //           builder: (_) => const ChizmachilikPage(),
+                    //         ),
+                    //       );
+                    //     });
+                    //   },
+                    // ),
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.settings_rounded,
-                      title: 'Sozlamalar',
+                      title: 'drawer.settings'.tr(),
                       gradientColors: [
                         const Color(0xFF6B7280),
                         const Color(0xFF4B5563),
@@ -196,9 +195,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                         Future.delayed(const Duration(milliseconds: 300), () {
                           if (!mounted) return;
                           navigator.push(
-                            MaterialPageRoute(
-                              builder: (_) => SettingsScreen(),
-                            ),
+                            MaterialPageRoute(builder: (_) => SettingsScreen()),
                           );
                         });
                       },
@@ -206,7 +203,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.login_outlined,
-                      title: 'Chiqish',
+                      title: 'drawer.logout'.tr(),
                       gradientColors: [
                         const Color(0xFFEC4899),
                         const Color(0xFFDB2777),
@@ -221,11 +218,16 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                       },
                     ),
                     const SizedBox(height: 32),
-                    Divider(color: Theme.of(context).dividerColor, thickness: 1),
+                    Divider(
+                      color: Theme.of(context).dividerColor,
+                      thickness: 1,
+                    ),
+                    const SizedBox(height: 12),
+                    _buildLanguageSelector(),
                     const SizedBox(height: 12),
                     _buildMenuItem(
                       icon: Icons.info_rounded,
-                      title: 'Dastur haqida',
+                      title: 'drawer.about'.tr(),
                       gradientColors: [
                         const Color(0xFFF59E0B),
                         const Color(0xFFEF4444),
@@ -259,12 +261,14 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
   Widget _buildHeader() {
     final extra = context.appColors;
     final user = _user;
-    final userName = (user?.displayName?.trim().isNotEmpty ?? false)
-        ? user!.displayName!.trim()
-        : 'Foydalanuvchi';
-    final userEmail = (user?.email?.trim().isNotEmpty ?? false)
-        ? user!.email!.trim()
-        : 'Email topilmadi';
+    final userName =
+        (user?.displayName?.trim().isNotEmpty ?? false)
+            ? user!.displayName!.trim()
+            : 'common.user'.tr();
+    final userEmail =
+        (user?.email?.trim().isNotEmpty ?? false)
+            ? user!.email!.trim()
+            : 'common.email_not_found'.tr();
     final userPhotoUrl = user?.photoURL;
 
     return Container(
@@ -288,21 +292,23 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
               ],
             ),
             child: ClipOval(
-              child: userPhotoUrl != null && userPhotoUrl.isNotEmpty
-                  ? Image.network(
-                userPhotoUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Icon(
-                  Icons.person_rounded,
-                  color: Colors.white,
-                  size: 40,
-                ),
-              )
-                  : const Icon(
-                Icons.person_rounded,
-                color: Colors.white,
-                size: 40,
-              ),
+              child:
+                  userPhotoUrl != null && userPhotoUrl.isNotEmpty
+                      ? Image.network(
+                        userPhotoUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder:
+                            (_, __, ___) => const Icon(
+                              Icons.person_rounded,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                      )
+                      : const Icon(
+                        Icons.person_rounded,
+                        color: Colors.white,
+                        size: 40,
+                      ),
             ),
           ),
           const SizedBox(height: 16),
@@ -317,10 +323,7 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           const SizedBox(height: 4),
           Text(
             userEmail,
-            style: TextStyle(
-              color: extra.textSecondary,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: extra.textSecondary, fontSize: 14),
           ),
         ],
       ),
@@ -347,31 +350,37 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
           curve: Curves.easeInOut,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            gradient: isSelected
-                ? LinearGradient(
-              colors: [
-                gradientColors[0].withValues(alpha: 0.3),
-                gradientColors[1].withValues(alpha: 0.3),
-              ],
-            )
-                : null,
-            color: isSelected ? null : extra.cardBackground.withValues(alpha: 0.35),
+            gradient:
+                isSelected
+                    ? LinearGradient(
+                      colors: [
+                        gradientColors[0].withValues(alpha: 0.3),
+                        gradientColors[1].withValues(alpha: 0.3),
+                      ],
+                    )
+                    : null,
+            color:
+                isSelected
+                    ? null
+                    : extra.cardBackground.withValues(alpha: 0.35),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected
-                  ? gradientColors[0].withValues(alpha: 0.5)
-                  : extra.cardBorder.withValues(alpha: 0.5),
+              color:
+                  isSelected
+                      ? gradientColors[0].withValues(alpha: 0.5)
+                      : extra.cardBorder.withValues(alpha: 0.5),
               width: isSelected ? 2 : 1,
             ),
-            boxShadow: isSelected
-                ? [
-              BoxShadow(
-                color: gradientColors[0].withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ]
-                : null,
+            boxShadow:
+                isSelected
+                    ? [
+                      BoxShadow(
+                        color: gradientColors[0].withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                    : null,
           ),
           child: Row(
             children: [
@@ -382,15 +391,16 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: gradientColors),
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: isSelected
-                      ? [
-                    BoxShadow(
-                      color: gradientColors[1].withValues(alpha: 0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ]
-                      : null,
+                  boxShadow:
+                      isSelected
+                          ? [
+                            BoxShadow(
+                              color: gradientColors[1].withValues(alpha: 0.4),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ]
+                          : null,
                 ),
                 child: Icon(
                   icon,
@@ -435,22 +445,18 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
         future: _packageInfoFuture,
         builder: (context, snapshot) {
           final packageInfo = snapshot.data;
-          final versionText = packageInfo == null
-              ? 'K-Quiz'
-              : 'K-Quiz v${packageInfo.version}';
+          final versionText =
+              packageInfo == null ? 'K-Quiz' : 'K-Quiz v${packageInfo.version}';
 
           return Column(
             children: [
               Text(
                 versionText,
-                style: TextStyle(
-                  color: extra.textSecondary,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: extra.textSecondary, fontSize: 12),
               ),
               const SizedBox(height: 8),
               Text(
-                '© 2024 Barcha huquqlar himoyalangan',
+                'footer.rights'.tr(),
                 style: TextStyle(
                   color: extra.textSecondary.withValues(alpha: 0.72),
                   fontSize: 10,
@@ -463,4 +469,105 @@ class _AnimatedDrawerState extends State<AnimatedDrawer> {
     );
   }
 
+  Widget _buildLanguageSelector() {
+    final extra = context.appColors;
+    final currentCode = context.locale.languageCode;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: extra.cardBackground.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: extra.cardBorder.withValues(alpha: 0.5)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.language_rounded,
+                color: extra.textSecondary,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'settings.language'.tr(),
+                style: TextStyle(
+                  color: extra.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: _buildLanguageButton(
+                  label: 'languages.uz'.tr(),
+                  isSelected: currentCode == 'uz',
+                  onTap: () => _changeLanguage(const Locale('uz')),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildLanguageButton(
+                  label: 'languages.ko'.tr(),
+                  isSelected: currentCode == 'ko',
+                  onTap: () => _changeLanguage(const Locale('ko')),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageButton({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final extra = context.appColors;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          gradient:
+              isSelected
+                  ? LinearGradient(
+                    colors: [extra.gradientStart, extra.gradientEnd],
+                  )
+                  : null,
+          color: isSelected ? null : extra.mutedSurface.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: isSelected ? Colors.white : extra.textPrimary,
+            fontWeight: FontWeight.w800,
+            fontSize: 13,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _changeLanguage(Locale locale) async {
+    await context.setLocale(locale);
+    await getIt<PrefUtils>().setLang(locale.languageCode);
+    if (mounted) {
+      setState(() {});
+    }
+  }
 }

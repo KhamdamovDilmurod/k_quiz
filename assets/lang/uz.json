@@ -1,0 +1,63 @@
+{
+  "app": {
+    "title": "Korean Quiz"
+  },
+  "common": {
+    "cancel": "Bekor qilish",
+    "email_not_found": "Email topilmadi",
+    "retry": "Qayta urinish",
+    "unknown_error": "Noma'lum xatolik",
+    "user": "Foydalanuvchi"
+  },
+  "splash": {
+    "load_error": "Yuklashda xatolik",
+    "preparing": "Ilova ishga tayyorlanmoqda",
+    "progress_bound": "Progress real yuklanish holatiga bog'langan."
+  },
+  "drawer": {
+    "about": "Dastur haqida",
+    "books": "Kitoblar",
+    "home": "Bosh sahifa",
+    "logout": "Chiqish",
+    "saved": "Sevimlilar",
+    "settings": "Sozlamalar",
+    "statistics": "Statistika"
+  },
+  "settings": {
+    "appearance": "Ko'rinish rejimi",
+    "dark_mode": "Dark mode",
+    "dark_mode_subtitle": "Qorong'i rejimni yoqish/o'chirish",
+    "data_status": "Ma'lumotlar holati",
+    "google_sheets_subtitle": "Baza ichidagi kitob/topic/so'zlarni qayta yuklaydi",
+    "google_sheets_update": "Google Sheets dan yangilash",
+    "language": "Til",
+    "language_subtitle": "Ilova interfeysi tilini tanlang",
+    "sync_never": "So'nggi sync: hali bajarilmagan",
+    "sync_time": "So'nggi sync: {time}",
+    "system_mode": "System mode",
+    "system_mode_subtitle": "Telefon sozlamasiga moslashadi",
+    "topics": "Topiclar",
+    "update_error": "Xatolik: {error}",
+    "update_success": "Yangilandi: {books} kitob, {topics} topic, {words} so'z",
+    "words": "So'zlar"
+  },
+  "languages": {
+    "ko": "Koreyscha",
+    "ko_native": "한국어",
+    "uz": "O'zbekcha",
+    "uz_native": "O'zbek"
+  },
+  "books": {
+    "empty": "Hozircha kitoblar yo'q",
+    "list_title": "Kitoblar ro'yxati",
+    "not_found": "Kitoblar topilmadi",
+    "title_with_name": "Kitoblar - {name}"
+  },
+  "logout": {
+    "confirm": "Ha, chiqish",
+    "confirm_message": "Haqiqatan ham akkauntingizdan chiqmoqchimisiz?"
+  },
+  "footer": {
+    "rights": "© 2024 Barcha huquqlar himoyalangan"
+  }
+}

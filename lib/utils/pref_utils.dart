@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/models/user_model.dart';
+import 'constants.dart';
 
 class PrefUtils {
   late SharedPreferences _shared;
@@ -16,6 +17,7 @@ class PrefUtils {
   static const _prefPhoneCode = "phone_code";
   static const _prefThemeMode = "theme_mode";
 
+  static const _prefLang = "pref_lang";
   Future<bool> init() async {
     _shared = await SharedPreferences.getInstance();
     return true;
@@ -56,6 +58,13 @@ class PrefUtils {
     }
   }
 
+  String getLang() {
+    return _shared.getString(_prefLang) ?? DEFAULT_LANG_KEY;
+  }
+
+  Future<bool> setLang(String value) async {
+    return _shared.setString(_prefLang, value);
+  }
   Future<bool> setUserInfo(UserModel? value) async {
     if (value == null) {
       return _shared.remove(_prefUser);
@@ -74,6 +83,7 @@ class PrefUtils {
         return ThemeMode.system;
     }
   }
+
 
   Future<bool> setThemeMode(ThemeMode mode) {
     return _shared.setString(_prefThemeMode, mode.name);

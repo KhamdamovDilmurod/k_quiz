@@ -22,6 +22,7 @@ dependencies:
   flutter_bloc:
   equatable:
   get_it:
+  easy_localization: ^3.0.8
   flutter_native_splash: ^2.4.4
   flutter_tts: ^4.2.5
 #  firebase
@@ -70,6 +71,7 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/lotties/
+    - assets/lang/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

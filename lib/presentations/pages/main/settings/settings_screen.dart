@@ -1,17 +1,16 @@
-
-import '../../../../../data/network/database_helper.dart';
-import '../../../../../data/repositories/word_repository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../../config/theme/app_theme_colors.dart';
-import '../../../../../config/theme/theme_cubit.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:k_quiz/config/theme/app_theme_colors.dart';
+import 'package:k_quiz/config/theme/theme_cubit.dart';
+import 'package:k_quiz/data/network/database_helper.dart';
+import 'package:k_quiz/data/repositories/word_repository.dart';
+import 'package:k_quiz/di/service_locator.dart';
+import 'package:k_quiz/utils/pref_utils.dart';
 
-import '../../../../../services/google_sheets_service.dart';
+import 'package:k_quiz/services/google_sheets_service.dart';
 
-// ============================================
-// 14. lib/screens/settings_screen.dart
-// ============================================
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -56,7 +55,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Yangilandi: ${counts['books']} kitob, ${counts['topics']} topic, ${counts['words']} soz',
+            'settings.update_success'.tr(
+              namedArgs: {
+                'books': '${counts['books']}',
+                'topics': '${counts['topics']}',
+                'words': '${counts['words']}',
+              },
+            ),
           ),
           backgroundColor: Colors.green,
         ),
@@ -64,7 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Xatolik: $e'),
+          content: Text('settings.update_error'.tr(namedArgs: {'error': '$e'})),
           backgroundColor: Colors.red,
         ),
       );
@@ -108,7 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     Expanded(
                       child: Text(
-                        'Sozlamalar',
+                        'drawer.settings'.tr(),
                         style: titleStyle.titleLarge?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: extra.textPrimary,
@@ -124,6 +129,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     _buildThemeModeCard(context),
                     const SizedBox(height: 14),
+                    _buildLanguageCard(context),
+                    const SizedBox(height: 14),
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -131,12 +138,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         gradient: LinearGradient(
                           colors: [
                             Theme.of(context).colorScheme.secondary,
-                            Theme.of(context).colorScheme.secondary.withValues(alpha: 0.82),
+                            Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.82),
                           ],
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.25),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.secondary.withValues(alpha: 0.25),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -146,18 +157,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Ma\'lumotlar holati',
+                            'settings.data_status',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                             ),
-                          ),
+                          ).tr(),
                           const SizedBox(height: 6),
                           Text(
                             _lastSyncedAt == null
-                                ? 'So\'nggi sync: hali bajarilmagan'
-                                : 'So\'nggi sync: ${_lastSyncedAt!.hour.toString().padLeft(2, '0')}:${_lastSyncedAt!.minute.toString().padLeft(2, '0')}',
+                                ? 'settings.sync_never'.tr()
+                                : 'settings.sync_time'.tr(
+                                  namedArgs: {
+                                    'time':
+                                        '${_lastSyncedAt!.hour.toString().padLeft(2, '0')}:${_lastSyncedAt!.minute.toString().padLeft(2, '0')}',
+                                  },
+                                ),
                             style: TextStyle(
                               color: Colors.white.withValues(alpha: 0.9),
                               fontSize: 13,
@@ -172,7 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Expanded(
                           child: _buildCountCard(
                             icon: Icons.menu_book_rounded,
-                            label: 'Kitoblar',
+                            label: 'drawer.books'.tr(),
                             value: _counts['books'] ?? 0,
                             color: const Color(0xFF16A34A),
                           ),
@@ -181,7 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Expanded(
                           child: _buildCountCard(
                             icon: Icons.topic_rounded,
-                            label: 'Topiclar',
+                            label: 'settings.topics'.tr(),
                             value: _counts['topics'] ?? 0,
                             color: const Color(0xFFF59E0B),
                           ),
@@ -191,7 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 12),
                     _buildCountCard(
                       icon: Icons.text_fields_rounded,
-                      label: 'Sozlar',
+                      label: 'settings.words'.tr(),
                       value: _counts['words'] ?? 0,
                       color: const Color(0xFF7C3AED),
                     ),
@@ -220,18 +236,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.14),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.secondary.withValues(alpha: 0.14),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: _isLoading
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: CircularProgressIndicator(strokeWidth: 2),
-                                    )
-                                  : const Icon(
-                                      Icons.cloud_download_rounded,
-                                      color: Color(0xFF1D4ED8),
-                                    ),
+                              child:
+                                  _isLoading
+                                      ? const Padding(
+                                        padding: EdgeInsets.all(10),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                      : const Icon(
+                                        Icons.cloud_download_rounded,
+                                        color: Color(0xFF1D4ED8),
+                                      ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -239,16 +260,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Google Sheets dan yangilash',
+                                    'settings.google_sheets_update'.tr(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 15,
                                       color: extra.textPrimary,
                                     ),
                                   ),
-                                  SizedBox(height: 2),
+                                  const SizedBox(height: 2),
                                   Text(
-                                    'Baza ichidagi kitob/topic/sozlarni qayta yuklaydi',
+                                    'settings.google_sheets_subtitle'.tr(),
                                     style: TextStyle(
                                       color: extra.textSecondary,
                                       fontSize: 12,
@@ -363,7 +384,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Ko\'rinish rejimi',
+                'settings.appearance'.tr(),
                 style: textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -371,8 +392,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 12),
               _buildSwitchRow(
                 icon: Icons.brightness_auto_rounded,
-                title: 'System mode',
-                subtitle: 'Telefon sozlamasiga moslashadi',
+                title: 'settings.system_mode'.tr(),
+                subtitle: 'settings.system_mode_subtitle'.tr(),
                 value: isSystem,
                 onChanged: (value) {
                   context.read<ThemeCubit>().changeTheme(
@@ -383,8 +404,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 10),
               _buildSwitchRow(
                 icon: Icons.dark_mode_rounded,
-                title: 'Dark mode',
-                subtitle: 'Qorong\'i rejimni yoqish/o\'chirish',
+                title: 'settings.dark_mode'.tr(),
+                subtitle: 'settings.dark_mode_subtitle'.tr(),
                 value: isDark,
                 onChanged: (value) {
                   context.read<ThemeCubit>().changeTheme(
@@ -413,7 +434,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.16),
+            color: Theme.of(
+              context,
+            ).colorScheme.secondary.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: Theme.of(context).colorScheme.secondary),
@@ -433,10 +456,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: TextStyle(
-                  color: extra.textSecondary,
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: extra.textSecondary, fontSize: 12),
               ),
             ],
           ),
@@ -448,5 +468,155 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildLanguageCard(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final extra = context.appColors;
+    final currentCode = context.locale.languageCode;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: extra.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'settings.language'.tr(),
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'settings.language_subtitle'.tr(),
+            style: TextStyle(color: extra.textSecondary, fontSize: 12),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _buildLanguageOption(
+                  icon: Icons.translate_rounded,
+                  title: 'languages.uz'.tr(),
+                  subtitle: 'languages.uz_native'.tr(),
+                  selected: currentCode == 'uz',
+                  onTap: () => _changeLanguage(const Locale('uz')),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildLanguageOption(
+                  icon: Icons.language_rounded,
+                  title: 'languages.ko'.tr(),
+                  subtitle: 'languages.ko_native'.tr(),
+                  selected: currentCode == 'ko',
+                  onTap: () => _changeLanguage(const Locale('ko')),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    final extra = context.appColors;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          gradient:
+              selected
+                  ? LinearGradient(
+                    colors: [extra.gradientStart, extra.gradientEnd],
+                  )
+                  : null,
+          color: selected ? null : extra.mutedSurface.withValues(alpha: 0.62),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color:
+                selected
+                    ? Colors.transparent
+                    : extra.cardBorder.withValues(alpha: 0.7),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  icon,
+                  color: selected ? Colors.white : extra.textSecondary,
+                  size: 19,
+                ),
+                const Spacer(),
+                Icon(
+                  selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                  color:
+                      selected
+                          ? Colors.white
+                          : extra.textSecondary.withValues(alpha: 0.55),
+                  size: 19,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: selected ? Colors.white : extra.textPrimary,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color:
+                    selected
+                        ? Colors.white.withValues(alpha: 0.84)
+                        : extra.textSecondary,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _changeLanguage(Locale locale) async {
+    await context.setLocale(locale);
+    await getIt<PrefUtils>().setLang(locale.languageCode);
+    if (mounted) {
+      setState(() {});
+    }
   }
 }

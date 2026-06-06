@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:k_quiz/config/theme/app_theme_colors.dart';
 import 'package:k_quiz/di/service_locator.dart';
 import 'package:k_quiz/presentations/pages/auth/login_screen.dart';
@@ -16,7 +17,8 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SplashCubit(getIt<GoogleSheetsService>())..initialize(),
+      create:
+          (context) => SplashCubit(getIt<GoogleSheetsService>())..initialize(),
       child: const SplashView(),
     );
   }
@@ -34,12 +36,18 @@ class SplashView extends StatelessWidget {
       listener: (context, state) {
         if (state.status == SplashStatus.success) {
           final savedUser = getIt<PrefUtils>().getUserData();
-          final nextPage = savedUser != null ? const BooksScreen() : const LoginScreen();
+          final nextPage =
+              savedUser != null ? const BooksScreen() : const LoginScreen();
 
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) => nextPage,
-              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              transitionsBuilder: (
+                context,
+                animation,
+                secondaryAnimation,
+                child,
+              ) {
                 return FadeTransition(opacity: animation, child: child);
               },
               transitionDuration: const Duration(milliseconds: 450),
@@ -80,15 +88,17 @@ class SplashView extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  'Yuklashda xatolik',
-                                  style: theme.textTheme.headlineSmall?.copyWith(
-                                    color: extra.textPrimary,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  'splash.load_error'.tr(),
+                                  style: theme.textTheme.headlineSmall
+                                      ?.copyWith(
+                                        color: extra.textPrimary,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                 ),
                                 const SizedBox(height: 10),
                                 Text(
-                                  state.errorMessage ?? 'Noma\'lum xatolik',
+                                  state.errorMessage ??
+                                      'common.unknown_error'.tr(),
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: extra.textSecondary,
@@ -109,22 +119,32 @@ class SplashView extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(18),
                                     ),
                                     child: ElevatedButton.icon(
-                                      onPressed: () => context.read<SplashCubit>().initialize(),
+                                      onPressed:
+                                          () =>
+                                              context
+                                                  .read<SplashCubit>()
+                                                  .initialize(),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.transparent,
                                         shadowColor: Colors.transparent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius: BorderRadius.circular(
+                                            18,
+                                          ),
                                         ),
                                       ),
-                                      icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                                      label: const Text(
-                                        'Qayta urinish',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                      icon: const Icon(
+                                        Icons.refresh_rounded,
+                                        color: Colors.white,
                                       ),
+                                      label:
+                                          const Text(
+                                            'common.retry',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ).tr(),
                                     ),
                                   ),
                                 ),
@@ -161,7 +181,9 @@ class SplashView extends StatelessWidget {
                                                 extra.gradientEnd,
                                               ],
                                             ),
-                                            borderRadius: BorderRadius.circular(14),
+                                            borderRadius: BorderRadius.circular(
+                                              14,
+                                            ),
                                           ),
                                           child: const Icon(
                                             Icons.cloud_download_rounded,
@@ -171,21 +193,30 @@ class SplashView extends StatelessWidget {
                                         const SizedBox(width: 14),
                                         Expanded(
                                           child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                'Ilova ishga tayyorlanmoqda',
-                                                style: theme.textTheme.titleMedium?.copyWith(
-                                                  color: extra.textPrimary,
-                                                  fontWeight: FontWeight.w700,
-                                                ),
+                                                'splash.preparing'.tr(),
+                                                style: theme
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.copyWith(
+                                                      color: extra.textPrimary,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                    ),
                                               ),
                                               const SizedBox(height: 4),
                                               Text(
-                                                'Progress real yuklanish holatiga bog‘langan.',
-                                                style: theme.textTheme.bodyMedium?.copyWith(
-                                                  color: extra.textSecondary,
-                                                ),
+                                                'splash.progress_bound'.tr(),
+                                                style: theme
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.copyWith(
+                                                      color:
+                                                          extra.textSecondary,
+                                                    ),
                                               ),
                                             ],
                                           ),
@@ -200,43 +231,53 @@ class SplashView extends StatelessWidget {
                                           begin: 0,
                                           end: state.progress.clamp(0.0, 1.0),
                                         ),
-                                        duration: const Duration(milliseconds: 220),
+                                        duration: const Duration(
+                                          milliseconds: 220,
+                                        ),
                                         builder: (context, value, child) {
                                           return LinearProgressIndicator(
                                             value: value,
                                             minHeight: 12,
-                                            backgroundColor:
-                                                extra.mutedSurface.withValues(alpha: 0.9),
-                                            valueColor: AlwaysStoppedAnimation<Color>(
-                                              extra.gradientStart,
-                                            ),
+                                            backgroundColor: extra.mutedSurface
+                                                .withValues(alpha: 0.9),
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  extra.gradientStart,
+                                                ),
                                           );
                                         },
                                       ),
                                     ),
                                     const SizedBox(height: 16),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Expanded(
                                           child: AnimatedSwitcher(
-                                            duration: const Duration(milliseconds: 220),
+                                            duration: const Duration(
+                                              milliseconds: 220,
+                                            ),
                                             child: Text(
                                               state.loadingMessage,
-                                              key: ValueKey(state.loadingMessage),
-                                              style: theme.textTheme.bodyMedium?.copyWith(
-                                                color: extra.textSecondary,
+                                              key: ValueKey(
+                                                state.loadingMessage,
                                               ),
+                                              style: theme.textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                    color: extra.textSecondary,
+                                                  ),
                                             ),
                                           ),
                                         ),
                                         const SizedBox(width: 12),
                                         Text(
                                           '${(state.progress * 100).toInt()}%',
-                                          style: theme.textTheme.titleMedium?.copyWith(
-                                            color: extra.textPrimary,
-                                            fontWeight: FontWeight.w800,
-                                          ),
+                                          style: theme.textTheme.titleMedium
+                                              ?.copyWith(
+                                                color: extra.textPrimary,
+                                                fontWeight: FontWeight.w800,
+                                              ),
                                         ),
                                       ],
                                     ),
